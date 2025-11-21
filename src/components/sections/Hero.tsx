@@ -16,10 +16,8 @@ import Flare from "@/assets/flare.png";
 import Light1 from "@/assets/light1.png";
 import BgStart from "@/assets/bgstart.png";
 
-import Star1 from "@/assets/star1.svg";
 import Star2 from "@/assets/star2.svg";
 import Star3 from "@/assets/star3.svg";
-import Star4 from "@/assets/star4.svg";
 import Star5 from "@/assets/star5.svg";
 
 export default function Hero() {

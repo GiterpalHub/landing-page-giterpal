@@ -1,12 +1,12 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import Link from "next/link";
-import OutlineButton from "../OutlineButton";
-import IconButton from "../IconButton";
-import { ArrowUpRight, User, Menu, X } from "lucide-react";
 import logo from "@/assets/logo.png";
+import { ArrowUpRight, Menu, X } from "lucide-react";
 import Image from "next/image";
+import Link from "next/link";
+import { useEffect, useState } from "react";
+import IconButton from "../IconButton";
+import OutlineButton from "../OutlineButton";
 export default function Navbar() {
   const [scrolled, setScrolled] = useState(false);
   const [isOpen, setIsOpen] = useState(false);
