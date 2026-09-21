@@ -2,42 +2,10 @@
 
 import Image from "next/image";
 import { ArrowUpRight } from "lucide-react";
+import Link from "next/link";
 import OutlineButton from "../OutlineButton";
 import IconButton from "../IconButton";
-
-const articles = [
-  {
-    id: 1,
-    title: "Revolusi AI: Bagaimana ChatGPT Mengubah Cara Kita Bekerja",
-    category: "Artificial Intelligence",
-    author: "Tech Insight",
-    date: "15 Januari 2026",
-    description:
-      "Kecerdasan buatan generatif seperti ChatGPT kini bukan lagi sekadar mainan, melainkan alat produktivitas utama. Dari coding hingga penulisan kreatif, AI merombak lanskap profesional dengan kecepatan yang belum pernah terjadi sebelumnya...",
-    image: "https://picsum.photos/seed/ai-tech/800/500",
-  },
-  {
-    id: 2,
-    title: "Masa Depan Web 3.0: Lebih dari Sekadar Crypto & NFT",
-    category: "Blockchain",
-    author: "Satoshi Nakamoto Jr.",
-    date: "12 Januari 2026",
-    description:
-      "Web 3.0 menjanjikan internet yang terdesentralisasi, di mana pengguna memiliki kendali penuh atas data mereka. Namun, tantangan skalabilitas dan adopsi massal masih menjadi hambatan utama yang perlu dipecahkan para developer...",
-    image: "https://picsum.photos/seed/web3/800/500",
-  },
-  {
-    id: 3,
-    title:
-      "Perbandingan Framework Frontend 2026: Next.js vs Remix vs SvelteKit",
-    category: "Web Development",
-    author: "Dev Community",
-    date: "10 Januari 2026",
-    description:
-      "Persaingan framework frontend semakin memanas. Next.js tetap dominan dengan fitur App Router-nya, namun Remix menawarkan manajemen data yang lebih intuitif, dan SvelteKit hadir dengan performa yang sangat ringan. Mana yang terbaik untuk proyek Anda?",
-    image: "https://picsum.photos/seed/coding/800/500",
-  },
-];
+import { articles } from "@/lib/data/articles";
 
 export default function Article() {
   return (
@@ -55,69 +23,81 @@ export default function Article() {
 
       <div className="max-w-7xl mx-auto w-full grid grid-cols-1 md:grid-cols-3 gap-8 mb-16">
         {articles.map((item) => (
-          <div
-            key={item.id}
-            className="
-              group relative p-4 
-              bg-white border border-gray-200 rounded-[32px] 
-              shadow-sm cursor-pointer
-              transition-all duration-500 ease-out
-              
-              hover:bg-[#623CEA] hover:border-[#623CEA] 
-              hover:shadow-2xl hover:-translate-y-2
-            "
+          <Link
+            key={item.slug}
+            href={`/artikel/${item.slug}`}
+            className="block"
           >
-            <div className="relative w-full h-56 mb-6 overflow-hidden rounded-[24px]">
-              <Image
-                src={item.image}
-                alt={item.title}
-                fill
-                className="object-cover transition-transform duration-700 group-hover:scale-110"
-              />
-            </div>
-
-            <div className="space-y-3 px-2 pb-2">
-              <div className="flex justify-between items-start gap-4">
-                <h3 className="text-2xl font-bold font-primary text-[#110C4C] leading-tight transition-colors duration-300 group-hover:text-white">
-                  {item.title}
-                </h3>
-                <span className="text-sm font-medium text-gray-500 whitespace-nowrap transition-colors duration-300 group-hover:text-white/80">
-                  {item.category}
-                </span>
+            <div
+              className="
+                group relative p-4
+                bg-white border border-gray-200 rounded-[32px]
+                shadow-sm cursor-pointer
+                transition-all duration-500 ease-out
+                hover:bg-[#623CEA] hover:border-[#623CEA]
+                hover:shadow-2xl hover:-translate-y-2
+              "
+            >
+              <div className="relative mb-6 h-56 w-full overflow-hidden rounded-[24px]">
+                <Image
+                  src={item.coverImage}
+                  alt={`Sampul artikel: ${item.title}`}
+                  fill
+                  className="object-cover transition-transform duration-700 group-hover:scale-110"
+                  sizes="(max-width: 768px) 100vw, 33vw"
+                />
               </div>
 
-              <div className="flex items-center gap-2 text-xs text-gray-400 transition-colors duration-300 group-hover:text-white/60">
-                <span>{item.author}</span>
-                <span>•</span>
-                <span>{item.date}</span>
-              </div>
+              <div className="space-y-3 px-2 pb-2">
+                <div className="flex items-start justify-between gap-4">
+                  <h3 className="font-primary text-2xl font-bold leading-tight text-[#110C4C] transition-colors duration-300 group-hover:text-white">
+                    {item.title}
+                  </h3>
+                  <span className="whitespace-nowrap text-sm font-medium text-gray-500 transition-colors duration-300 group-hover:text-white/80">
+                    {item.category}
+                  </span>
+                </div>
 
-              <p className="text-sm text-gray-600 leading-relaxed line-clamp-3 transition-colors duration-300 group-hover:text-white/90">
-                {item.description}
-              </p>
+                <div className="flex items-center gap-2 text-xs text-gray-400 transition-colors duration-300 group-hover:text-white/60">
+                  <span>{item.author}</span>
+                  <span>•</span>
+                  <span>{item.date}</span>
+                </div>
+
+                <p className="line-clamp-3 text-sm leading-relaxed text-gray-600 transition-colors duration-300 group-hover:text-white/90">
+                  {item.excerpt}
+                </p>
+              </div>
             </div>
-          </div>
+          </Link>
         ))}
       </div>
 
       <div className="flex justify-center items-center gap-4">
-        <OutlineButton
+        <Link href={`/artikel/${articles[0].slug}`}>
+          <OutlineButton
           className="
             border-gray-300 text-[#110C4C] rounded-full px-8 py-6
             hover:bg-[#623CEA] hover:text-white hover:border-[#623CEA]
           "
-        >
-          Jelajahi Artikel
-        </OutlineButton>
+          >
+            Baca Artikel
+          </OutlineButton>
+        </Link>
 
-        <IconButton
+        <Link
+          href={`/artikel/${articles[0].slug}`}
+          aria-label="Buka artikel terbaru"
+        >
+          <IconButton
           className="
             bg-[#623CEA] text-white w-14 h-14 rounded-full
             hover:bg-[#502bb5] hover:scale-110
           "
-        >
-          <ArrowUpRight className="w-6 h-6" />
-        </IconButton>
+          >
+            <ArrowUpRight className="w-6 h-6" aria-hidden="true" />
+          </IconButton>
+        </Link>
       </div>
     </div>
   );

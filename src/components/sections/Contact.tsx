@@ -178,10 +178,15 @@ export default function Contact() {
             <div>
               <h4 className="text-white font-bold text-lg mb-4">Menu</h4>
               <ul className="space-y-2">
-                {["Beranda", "Karya", "Artikel", "Tentang"].map((item) => (
-                  <li key={item}>
+                {[
+                  ["Beranda", "#hero"],
+                  ["Karya", "#project"],
+                  ["Artikel", "#article"],
+                  ["Tentang Kami", "#about"],
+                ].map(([item, href]) => (
+                  <li key={href}>
                     <a
-                      href="#"
+                      href={href}
                       className="hover:text-[#8B5CF6] transition-colors"
                     >
                       {item}
@@ -194,7 +199,14 @@ export default function Contact() {
             <div>
               <h4 className="text-white font-bold text-lg mb-4">Hubungi</h4>
               <ul className="space-y-2">
-                <li>giterpal@gmail.com</li>
+                <li>
+                  <a
+                    href="mailto:giterpal@gmail.com"
+                    className="transition-colors hover:text-white"
+                  >
+                    giterpal@gmail.com
+                  </a>
+                </li>
                 <li>Whatsapp Community</li>
                 <li>Discord Community</li>
               </ul>
@@ -203,10 +215,15 @@ export default function Contact() {
 
           <div className="flex flex-col md:flex-row justify-between items-center pt-6 border-t border-white/5 gap-4">
             <div className="flex gap-4">
-              {[Github, Instagram, Globe].map((Icon, idx) => (
+              {[
+                { Icon: Github, href: "https://github.com/GiterpalHub", label: "GitHub Giterpal" },
+                { Icon: Instagram, href: "#contact", label: "Instagram Giterpal (URL segera ditambahkan)" },
+                { Icon: Globe, href: "#contact", label: "Kanal komunitas Giterpal" },
+              ].map(({ Icon, href, label }) => (
                 <a
-                  key={idx}
-                  href="#"
+                  key={label}
+                  href={href}
+                  aria-label={label}
                   className="p-2 bg-white/5 rounded-full hover:bg-[#8B5CF6] hover:text-white transition-colors"
                 >
                   <Icon className="w-4 h-4" />
