@@ -7,6 +7,14 @@ import Link from "next/link";
 import { useEffect, useState } from "react";
 import IconButton from "../IconButton";
 import OutlineButton from "../OutlineButton";
+
+const navigationItems = [
+  { label: "Beranda", href: "#hero" },
+  { label: "Karya", href: "#project" },
+  { label: "Testimoni", href: "#testimonials" },
+  { label: "Artikel", href: "#article" },
+  { label: "Tentang Kami", href: "#about" },
+];
 export default function Navbar() {
   const [scrolled, setScrolled] = useState(false);
   const [isOpen, setIsOpen] = useState(false);
@@ -45,7 +53,7 @@ export default function Navbar() {
       <div className="max-w-7xl mx-auto px-6 flex justify-between items-center">
         <Link
           href="#hero"
-          className="font-bold text-xl flex items-center gap-2 z-50"
+          className="z-50 flex items-center gap-2 font-primary text-xl font-bold"
         >
           <div
             className={`p-2 rounded-full transition-colors duration-300 ${
@@ -57,26 +65,24 @@ export default function Navbar() {
               alt="Giterpal Logo"
               width={24}
               height={24}
-              className="w-6 h-6 object-contain"
+              className="h-6 w-6 rounded-full object-cover"
             />
           </div>
-          <span className="tracking-wider">GITERPAL</span>
+          <span className="font-primary tracking-wider">GITERPAL</span>
         </Link>
 
         <div className="hidden md:flex gap-8 font-secondary text-sm font-medium">
-          {["Beranda", "Karya", "Testimoni", "Artikel", "Tentang Kami"].map(
-            (item) => (
+          {navigationItems.map((item) => (
               <Link
-                key={item}
-                href={`#${item.toLowerCase().replace(" ", "")}`}
-                className="hover:text-purple-500 transition-colors relative group"
+                key={item.href}
+                href={item.href}
+                className="group relative transition-colors hover:text-white hover:drop-shadow-[0_0_8px_rgba(255,255,255,0.95)]"
               >
-                {item}
+                {item.label}
 
-                <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-purple-500 transition-all duration-300 group-hover:w-full"></span>
+                <span className="absolute -bottom-1 left-0 h-0.5 w-0 bg-white shadow-[0_0_8px_rgba(255,255,255,0.95)] transition-all duration-300 group-hover:w-full"></span>
               </Link>
-            )
-          )}
+          ))}
         </div>
 
         <div className="hidden md:flex space-x-3 items-center">
@@ -126,18 +132,16 @@ export default function Navbar() {
         `}
       >
         <div className="flex flex-col items-center gap-6 font-secondary text-primary">
-          {["Beranda", "Karya", "Testimoni", "Artikel", "Tentang Kami"].map(
-            (item) => (
+          {navigationItems.map((item) => (
               <Link
-                key={item}
-                href={`#${item.toLowerCase().replace(" ", "")}`}
+                key={item.href}
+                href={item.href}
                 className="text-lg font-medium hover:text-purple-600 transition-colors"
                 onClick={() => setIsOpen(false)}
               >
-                {item}
+                {item.label}
               </Link>
-            )
-          )}
+          ))}
 
           <hr className="w-1/2 border-gray-300/50" />
 

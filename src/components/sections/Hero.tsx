@@ -262,7 +262,7 @@ export default function Hero() {
               return (
                 <span
                   key={index}
-                  className={`transition-all duration-700 ease-[cubic-bezier(0.4,0,0.2,1)] ${extraClass} ${
+                  className={`transition-all duration-700 ease-in-out ${extraClass} ${
                     !isRevealed ? "animate-pulse" : ""
                   }`}
                   style={{

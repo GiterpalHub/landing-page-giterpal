@@ -3,6 +3,7 @@ import Hero from "@/components/sections/Hero";
 import Testimonials from "@/components/sections/Testimonials";
 import Project from "@/components/sections/Project";
 import Article from "@/components/sections/Article";
+import About from "@/components/sections/About";
 import LanyardDivider from "@/components/LanyardDivider";
 
 export default function Home() {
@@ -22,6 +23,9 @@ export default function Home() {
 
       <section id="article">
         <Article />
+      </section>
+      <section id="about">
+        <About />
       </section>
       <LanyardDivider />
       <section id="contact">

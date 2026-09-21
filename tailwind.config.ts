@@ -13,8 +13,9 @@ const config: Config = {
         'spin-slow': 'spin 20s linear infinite',
       },
       fontFamily: {
-        primary: ["Syne", "sans-serif"],
-        secondary: ['"Plus Jakarta Sans"', "sans-serif"],
+        primary: ["var(--font-syne)", "sans-serif"],
+        secondary: ["var(--font-jakarta)", "sans-serif"],
+        sans: ["var(--font-jakarta)", "sans-serif"],
       },
       colors: {
         background: "hsl(var(--background))",
@@ -65,6 +66,6 @@ const config: Config = {
       },
     },
   },
-  //   plugins: [require("tailwindcss-animate")],
+  plugins: [require("tailwindcss-animate")],
 };
 export default config;
