@@ -9,11 +9,11 @@ import IconButton from "../IconButton";
 import OutlineButton from "../OutlineButton";
 
 const navigationItems = [
-  { label: "Beranda", href: "#hero" },
-  { label: "Karya", href: "#project" },
-  { label: "Testimoni", href: "#testimonials" },
-  { label: "Artikel", href: "#article" },
-  { label: "Tentang Kami", href: "#about" },
+  { label: "Beranda", href: "/#hero" },
+  { label: "Karya", href: "/#project" },
+  { label: "Testimoni", href: "/#testimonials" },
+  { label: "Artikel", href: "/#article" },
+  { label: "Tentang Kami", href: "/#about" },
 ];
 export default function Navbar() {
   const [scrolled, setScrolled] = useState(false);
@@ -52,7 +52,7 @@ export default function Navbar() {
     >
       <div className="max-w-7xl mx-auto px-6 flex justify-between items-center">
         <Link
-          href="#hero"
+          href="/"
           className="z-50 flex items-center gap-2 font-primary text-xl font-bold"
         >
           <div
@@ -86,24 +86,28 @@ export default function Navbar() {
         </div>
 
         <div className="hidden md:flex space-x-3 items-center">
-          <OutlineButton
-            className={`${
-              isActive
-                ? "border-primary text-primary hover:bg-primary hover:text-white"
-                : "border-white text-white hover:bg-white hover:text-primary"
-            }`}
-          >
-            Kontak Kami
-          </OutlineButton>
-          <IconButton
-            className={`${
-              isActive
-                ? "bg-transparent border border-primary text-primary hover:bg-primary hover:text-white"
-                : "bg-white text-primary hover:bg-gray-200"
-            }`}
-          >
-            <ArrowUpRight size={18} />
-          </IconButton>
+          <Link href="/#contact">
+            <OutlineButton
+              className={`${
+                isActive
+                  ? "border-primary text-primary hover:bg-primary hover:text-white"
+                  : "border-white text-white hover:bg-white hover:text-primary"
+              }`}
+            >
+              Kontak Kami
+            </OutlineButton>
+          </Link>
+          <a href="mailto:giterpal@gmail.com">
+            <IconButton
+              className={`${
+                isActive
+                  ? "bg-transparent border border-primary text-primary hover:bg-primary hover:text-white"
+                  : "bg-white text-primary hover:bg-gray-200"
+              }`}
+            >
+              <ArrowUpRight size={18} />
+            </IconButton>
+          </a>
         </div>
 
         <button
@@ -146,12 +150,14 @@ export default function Navbar() {
           <hr className="w-1/2 border-gray-300/50" />
 
           <div className="flex flex-col gap-3 w-full px-8">
-            <OutlineButton
-              className="w-full justify-center border-primary text-primary hover:bg-primary hover:text-white transition-all"
-              onClick={() => setIsOpen(false)}
-            >
-              Kontak Kami
-            </OutlineButton>
+            <Link href="/#contact">
+              <OutlineButton
+                className="w-full justify-center border-primary text-primary hover:bg-primary hover:text-white transition-all"
+                onClick={() => setIsOpen(false)}
+              >
+                Kontak Kami
+              </OutlineButton>
+            </Link>
           </div>
         </div>
       </div>
