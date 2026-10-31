@@ -49,17 +49,23 @@ export default function Hero() {
     window.addEventListener("scroll", handleScroll);
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
-
+  const scrollOneScreen = () => {
+    window.scrollBy({
+      top: window.innerHeight,
+      left: 0,
+      behavior: "smooth",
+    });
+  };
   const highlightConfig: Record<string, { color: string; className: string }> =
-    {
-      mahasiswa: { color: "#FF5FFA", className: "font-bold" },
-      TRPL: { color: "#FF5FFA", className: "font-bold" },
-      skill: { color: "#6BECFF", className: "font-bold" },
-      koneksi: { color: "#6BECFF", className: "font-bold" },
-      tantangan: { color: "#FF5FFA", className: "font-bold" },
-      kerja: { color: "#6BECFF", className: "font-bold" },
-      nyata: { color: "#6BECFF", className: "font-bold" },
-    };
+  {
+    mahasiswa: { color: "#FF5FFA", className: "font-bold" },
+    TRPL: { color: "#FF5FFA", className: "font-bold" },
+    skill: { color: "#6BECFF", className: "font-bold" },
+    koneksi: { color: "#6BECFF", className: "font-bold" },
+    tantangan: { color: "#FF5FFA", className: "font-bold" },
+    kerja: { color: "#6BECFF", className: "font-bold" },
+    nyata: { color: "#6BECFF", className: "font-bold" },
+  };
 
   const visiDescription =
     "Membangun komunitas tempat mahasiswa TRPL mengasah skill, memperluas koneksi, dan menyiapkan diri menghadapi tantangan dunia kerja nyata.";
@@ -136,9 +142,8 @@ export default function Hero() {
       <div
         className="absolute top-64 -right-12 md:top-80 md:-right-24 z-20 pointer-events-none transition-transform duration-100 ease-out"
         style={{
-          transform: `translateY(${scrollY * 0.1}px) rotate(${
-            scrollY * 0.05
-          }deg)`,
+          transform: `translateY(${scrollY * 0.1}px) rotate(${scrollY * 0.05
+            }deg)`,
         }}
       >
         <div className="animate-float-slow delay-300 w-48 md:w-[600px]">
@@ -173,7 +178,7 @@ export default function Hero() {
           className="relative z-30 animate-fade-in-up delay-300"
           style={{ transform: `translateY(${scrollY * 0.2}px)` }}
         >
-          <GlowButton>
+          <GlowButton onClick={scrollOneScreen}>
             <p className="px-4 md:px-0">MULAI</p>
           </GlowButton>
         </div>
@@ -262,9 +267,8 @@ export default function Hero() {
               return (
                 <span
                   key={index}
-                  className={`transition-all duration-700 ease-in-out ${extraClass} ${
-                    !isRevealed ? "animate-pulse" : ""
-                  }`}
+                  className={`transition-all duration-700 ease-in-out ${extraClass} ${!isRevealed ? "animate-pulse" : ""
+                    }`}
                   style={{
                     backgroundColor: isRevealed ? "transparent" : skeletonColor,
                     color: isRevealed ? baseColor : "transparent",
