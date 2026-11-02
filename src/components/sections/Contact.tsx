@@ -6,11 +6,7 @@ import {
   ToggleRight,
   Eye,
   Send,
-  Github,
-  Instagram,
-  Globe,
   MoveRight,
-  ArrowUpRight,
 } from "lucide-react";
 import Marquee from "react-fast-marquee";
 import { useEffect, useState } from "react";
