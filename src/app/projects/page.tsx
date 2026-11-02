@@ -19,7 +19,7 @@ export const metadata: Metadata = {
 
 export default function PameranProjectPage() {
   return (
-    <div className="relative flex flex-col min-h-screen w-full bg-[linear-gradient(35deg,#110C4C_25%,#6F2ED6_100%)] text-white font-sans overflow-x-hidden">
+    <div className="relative flex flex-col min-h-screen w-full bg-[linear-gradient(35deg,#110C4C_25%,#6F2ED6_100%)] text-white font-secondary overflow-x-hidden">
       
       <div className="fixed inset-0 z-0 pointer-events-none">
         <div className="absolute inset-0 opacity-10 mix-blend-screen scale-[2] md:scale-150">
