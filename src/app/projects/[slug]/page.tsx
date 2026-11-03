@@ -9,6 +9,7 @@ import { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 import FeedbackButton from '@/components/FeedbackButton';
 import Link from 'next/link';
+import { Github, Globe, Smartphone } from 'lucide-react';
 
 interface ProjectPageProps {
   params: {
@@ -71,7 +72,6 @@ const PreviewProjectSection = ({ params }: ProjectPageProps) => {
         <Image src={BgStart} alt="Star Trail Background" fill className="object-cover" />
       </div>
 
-
       <div className="absolute top-[5%] left-[5%] md:top-[10%] md:left-16 lg:left-28 w-12 h-12 md:w-16 md:h-16 lg:w-20 lg:h-20 opacity-95 z-0 animate-pulse pointer-events-none rotate-[75deg]">
         <Image src={Star2} alt="Top Left Spark" fill className="object-contain" />
       </div>
@@ -88,34 +88,88 @@ const PreviewProjectSection = ({ params }: ProjectPageProps) => {
         <Image src={Star3} alt="Faint Lower Tiny Spark" fill className="object-contain" />
       </div>
 
+      <div className="container mx-auto px-6 md:px-12 lg:px-24 flex flex-col-reverse md:flex-row items-center justify-between z-10 gap-12 relative mt-4 md:mt-0">
 
-      <div className=" container mx-auto px-6 md:px-12 lg:px-24 flex flex-col-reverse md:flex-row items-center justify-between z-10 gap-12 relative mt-4 md:mt-0">
-
-        <div className="w-full md:w-1/2 flex flex-col items-center text-center md:items-start md:text-left space-y-6">
-          <div className="text-xs md:text-sm font-medium tracking-wider text-gray-400 mb-2">
+        <div className="w-full md:w-1/2 flex flex-col items-center text-center md:items-start md:text-left space-y-5">
+          <div className="text-xs md:text-sm font-medium tracking-wider text-gray-400">
             Pameran / Preview Project
           </div>
 
-          <h2 className="font-primary text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold mb-4 tracking-wide">
+          <h2 className="font-primary text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold tracking-wide">
             {project.title}
           </h2>
+
+          {project.creator && (
+            <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white/5 border border-white/10 text-xs sm:text-sm shadow-sm backdrop-blur-sm">
+              <span className="text-gray-400">Pembuat:</span>
+              {project.creatorUrl ? (
+                <a
+                  href={project.creatorUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-[#6BECFF] font-semibold hover:text-white hover:underline transition-colors duration-300"
+                >
+                  {project.creator}
+                </a>
+              ) : (
+                <span className="text-[#6BECFF] font-semibold">{project.creator}</span>
+              )}
+            </div>
+          )}
 
           <p className="text-sm md:text-base lg:text-lg text-gray-300 leading-relaxed max-w-xl">
             {project.description}
           </p>
 
-          <Link href={"/projects"} className="mt-8 px-8 py-3 rounded-full border border-purple-500/50 hover:bg-purple-600/30 hover:text-white hover:border-transparent transition-all duration-300 bg-transparent text-gray-300 text-xs sm:text-sm font-medium">
-            Lihat Semua
-          </Link>
+          <div className="flex flex-wrap items-center justify-center md:justify-start gap-4 mt-6">
+
+            {project.liveUrl && (
+              <a
+                href={project.liveUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex items-center justify-center gap-2 w-full sm:w-auto px-6 py-2.5 rounded-full bg-[#623CEA] hover:bg-[#502bb5] text-white text-sm font-medium transition-all duration-300 shadow-[0_0_15px_rgba(98,60,234,0.4)] hover:shadow-[0_0_25px_rgba(98,60,234,0.6)] hover:-translate-y-1"
+              >
+                {project.category === "Mobile" ? (
+                  <>
+                    <Smartphone className="w-4 h-4" /> Unduh Aplikasi
+                  </>
+                ) : (
+                  <>
+                    <Globe className="w-4 h-4" /> Kunjungi Web
+                  </>
+                )}
+              </a>
+            )}
+
+            {project.repoUrl && (
+              <a
+                href={project.repoUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex items-center gap-2 px-6 py-2.5 rounded-full bg-white/10 border border-white/20 hover:bg-white/20 hover:border-white/40 text-white text-xs sm:text-sm font-medium transition-all duration-300 hover:-translate-y-1 backdrop-blur-md"
+              >
+                <Github className="w-4 h-4" /> Repository
+              </a>
+            )}
+
+            <Link
+              href={"/projects"}
+              className="px-6 py-2.5 rounded-full border border-purple-500/50 hover:bg-purple-600/30 text-gray-300 hover:text-white hover:border-transparent transition-all duration-300 bg-transparent text-xs sm:text-sm font-medium"
+            >
+              Lihat Semua
+            </Link>
+
+          </div>
         </div>
 
         <div className="w-full md:w-1/2 flex flex-col items-center justify-center md:items-end relative">
 
           <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[120%] h-[120%] md:w-[130%] md:h-[130%] bg-purple-600 blur-[80px] md:blur-[100px] opacity-20 rounded-full z-0 pointer-events-none"></div>
 
-          <div className="relative z-10 w-full max-w-lg flex flex-col items-end gap-5">
+          <div className="relative z-10 w-full flex flex-col items-center md:items-end gap-5">
 
-            <div className="w-full rounded-xl overflow-hidden border-2 border-purple-500/40 p-1.5 md:p-2 bg-black/20 backdrop-blur-sm shadow-[0_0_40px_rgba(168,85,247,0.3)]">
+            <div className="w-full rounded-xl overflow-hidden border-2 border-purple-500/40 p-1.5 md:p-2 bg-black/20 backdrop-blur-sm shadow-[0_0_40px_rgba(168,85,247,0.3)] hover:scale-[1.02] transition-transform duration-500">
               <div className="relative w-full aspect-[16/9] rounded-lg overflow-hidden bg-[#1e1b4b] flex items-center justify-center">
                 {project.image && (
                   <Image

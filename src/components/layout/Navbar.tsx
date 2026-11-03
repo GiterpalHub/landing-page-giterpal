@@ -15,6 +15,7 @@ const navigationItems = [
   { label: "Artikel", href: "/#article" },
   { label: "Tentang Kami", href: "/#about" },
 ];
+
 export default function Navbar() {
   const [scrolled, setScrolled] = useState(false);
   const [isOpen, setIsOpen] = useState(false);
@@ -31,6 +32,29 @@ export default function Navbar() {
     window.addEventListener("scroll", handleScroll);
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
+
+  const handleNavClick = (e: React.MouseEvent<HTMLAnchorElement>, href: string) => {
+    setIsOpen(false); 
+
+    const isHashLink = href.includes("#");
+    
+    if (isHashLink) {
+      const targetId = href.split("#")[1];
+      const elem = document.getElementById(targetId);
+      
+      if (elem) {
+        e.preventDefault(); 
+        
+        const elementPosition = elem.getBoundingClientRect().top;
+        const offsetPosition = elementPosition + window.scrollY;
+        
+        window.scrollTo({
+          top: offsetPosition,
+          behavior: "smooth"
+        });
+      }
+    }
+  };
 
   const isActive = scrolled || isOpen;
 
@@ -53,6 +77,7 @@ export default function Navbar() {
       <div className="max-w-7xl mx-auto px-6 flex justify-between items-center">
         <Link
           href="/"
+          onClick={(e) => handleNavClick(e, "/")}
           className="z-50 flex items-center gap-2 font-primary text-xl font-bold"
         >
           <div
@@ -76,17 +101,17 @@ export default function Navbar() {
               <Link
                 key={item.href}
                 href={item.href}
+                onClick={(e) => handleNavClick(e, item.href)}
                 className="group relative transition-colors hover:text-white hover:drop-shadow-[0_0_8px_rgba(255,255,255,0.95)]"
               >
                 {item.label}
-
                 <span className="absolute -bottom-1 left-0 h-0.5 w-0 bg-white shadow-[0_0_8px_rgba(255,255,255,0.95)] transition-all duration-300 group-hover:w-full"></span>
               </Link>
           ))}
         </div>
 
         <div className="hidden md:flex space-x-3 items-center">
-          <Link href="/#contact">
+          <Link href="/#contact" onClick={(e) => handleNavClick(e, "/#contact")}>
             <OutlineButton
               className={`${
                 isActive
@@ -141,7 +166,7 @@ export default function Navbar() {
                 key={item.href}
                 href={item.href}
                 className="text-lg font-medium hover:text-purple-600 transition-colors"
-                onClick={() => setIsOpen(false)}
+                onClick={(e) => handleNavClick(e, item.href)}
               >
                 {item.label}
               </Link>
@@ -150,10 +175,9 @@ export default function Navbar() {
           <hr className="w-1/2 border-gray-300/50" />
 
           <div className="flex flex-col gap-3 w-full px-8">
-            <Link href="/#contact">
+            <Link href="/#contact" onClick={(e) => handleNavClick(e, "/#contact")}>
               <OutlineButton
                 className="w-full justify-center border-primary text-primary hover:bg-primary hover:text-white transition-all"
-                onClick={() => setIsOpen(false)}
               >
                 Kontak Kami
               </OutlineButton>

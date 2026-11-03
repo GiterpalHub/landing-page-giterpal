@@ -8,7 +8,6 @@ import StarTrail from "@/assets/star-trail.svg";
 import Image from "next/image";
 
 import cloudImage from "@/assets/cloud.png";
-import Dicoding from "@/assets/dicoding.png";
 import Planet1 from "@/assets/palent1.png";
 import Planet2 from "@/assets/planet2.png";
 import Moon from "@/assets/moon.png";
@@ -181,21 +180,6 @@ export default function Hero() {
           <GlowButton onClick={scrollOneScreen}>
             <p className="px-4 md:px-0">MULAI</p>
           </GlowButton>
-        </div>
-
-        <div className="absolute bottom-24 md:bottom-8 md:left-24 md:translate-x-0 text-center md:text-left z-20 animate-fade-in-up delay-300 w-full md:w-auto">
-          <h2 className="font-secondary mb-2 text-sm md:text-md text-white/70">
-            Part of
-          </h2>
-          <div className="flex justify-center md:justify-start">
-            <Image
-              src={Dicoding}
-              width={200}
-              height={60}
-              alt="dicoding"
-              className="opacity-90 hover:opacity-100 transition-opacity w-32 md:w-[200px] h-auto"
-            />
-          </div>
         </div>
       </div>
 
