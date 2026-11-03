@@ -1,8 +1,30 @@
+"use client";
+
 import Link from "next/link";
 import { Github, Globe, Instagram, ArrowUpRight } from "lucide-react";
 
 export default function Footer() {
   const currentYear = new Date().getFullYear();
+
+  const handleNavClick = (e: React.MouseEvent<HTMLAnchorElement>, href: string) => {
+    const isHashLink = href.includes("#");
+    
+    if (isHashLink) {
+      const targetId = href.split("#")[1];
+      const elem = document.getElementById(targetId);
+      
+      if (elem) {
+        e.preventDefault();
+        const elementPosition = elem.getBoundingClientRect().top;
+        const offsetPosition = elementPosition + window.scrollY ;
+        
+        window.scrollTo({
+          top: offsetPosition,
+          behavior: "smooth"
+        });
+      }
+    }
+  };
 
   return (
     <footer className="relative z-20 w-full bg-[#050415]/80 backdrop-blur-xl border-t border-white/10 text-gray-400 text-sm mt-auto overflow-hidden">
@@ -24,7 +46,7 @@ export default function Footer() {
             <h4 className="text-white font-bold text-lg mb-6 tracking-wide">Menu Navigasi</h4>
             <ul className="space-y-4">
               {[
-                ["Beranda", "/"],
+                ["Beranda", "/#hero"],
                 ["Karya", "/projects"],
                 ["Artikel", "/articles"],
                 ["Tentang Kami", "/#about"],
@@ -32,6 +54,7 @@ export default function Footer() {
                 <li key={href}>
                   <Link
                     href={href}
+                    onClick={(e) => handleNavClick(e, href)}
                     className="group flex items-center gap-2 w-fit hover:text-white transition-all duration-300"
                   >
                     <span className="h-[1px] w-0 bg-[#8B5CF6] transition-all duration-300 group-hover:w-4"></span>
@@ -74,7 +97,7 @@ export default function Footer() {
           <div className="flex gap-4">
             {[
               { Icon: Github, href: "https://github.com/GiterpalHub", label: "GitHub Giterpal" },
-              { Icon: Instagram, href: "https://www.instagram.com/giterpal.community?exln=MWJkYWQzOWVjNm16dw==", label: "Instagram Giterpal" },
+              { Icon: Instagram, href: "https://www.instagram.com/giterpal.community", label: "Instagram Giterpal" },
               { Icon: Globe, href: "/", label: "Website Komunitas Giterpal" },
             ].map(({ Icon, href, label }) => (
               <a
