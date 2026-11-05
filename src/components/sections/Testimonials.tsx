@@ -114,16 +114,16 @@ export default function Testimonials() {
     const progress = Math.max(0, Math.min(1, scrolled / scrollDistance));
 
     // Phase timings aligned so all cards finish before Article's -mt-[105vh] covers the viewport at ~0.75
-    const PHASE_TYPING_END = 0.18;
-    const PHASE_ZOOM_START = 0.21;
-    const PHASE_ZOOM_END = 0.32;
-    const PHASE_CARDS_START = 0.24;
+    const PHASE_TYPING_END = 0.21;
+    const PHASE_ZOOM_START = 0.25;
+    const PHASE_ZOOM_END = 0.35;
+    const PHASE_CARDS_START = 0.27;
     const PHASE_CARDS_END = 0.76;
 
     // Scroll-driven handwriting progress:
-    // Starts drawing as the centered heading rises into the lower-middle viewport (-0.22 * vh)
+    // Starts drawing as the centered heading rises into the lower-middle viewport (-0.25 * vh)
     // and completes while pinned at center (PHASE_TYPING_END * scrollDistance)
-    const typingStartScrolled = -0.22 * vh;
+    const typingStartScrolled = -0.25 * vh;
     const typingEndScrolled = PHASE_TYPING_END * scrollDistance;
     const typingProgress = Math.max(
       0,
