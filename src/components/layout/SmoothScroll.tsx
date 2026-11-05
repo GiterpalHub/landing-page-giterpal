@@ -13,11 +13,13 @@ export default function SmoothScroll({
       root
       autoRaf
       options={{
-        lerp: 0.08, // Classic luxurious buttery inertia
-        wheelMultiplier: 1.1, // Natural scroll distance per wheel notch
-        touchMultiplier: 1.5,
+        lerp: 0.06, // True physics damping for a pronounced, velvety gliding momentum
+        wheelMultiplier: 1.2, // Effortless glide distance per wheel tick
+        touchMultiplier: 1.8,
         smoothWheel: true,
-        syncTouch: false, // Keep native 1:1 hardware precision on trackpads/touch to eliminate jiggle
+        syncTouch: true, // Smooth inertia on touchpads/trackpads
+        syncTouchLerp: 0.07,
+        touchInertiaExponent: 1.75,
         orientation: "vertical",
         gestureOrientation: "vertical",
       }}
