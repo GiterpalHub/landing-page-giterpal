@@ -2,7 +2,6 @@ import Image from 'next/image';
 import Star2 from "@/assets/star2.svg";
 import Star3 from "@/assets/star3.svg";
 import Star5 from "@/assets/star5.svg";
-import Star1 from "@/assets/star1.svg";
 import BgStart from "@/assets/bgstart.png"
 import { projects } from '@/lib/data/projects';
 import { Metadata } from 'next';
@@ -186,7 +185,7 @@ const PreviewProjectSection = ({ params }: ProjectPageProps) => {
           </div>
 
           <div className="absolute -bottom-10 -right-5 md:-bottom-16 md:-right-10 lg:-bottom-24 lg:-right-14 w-24 h-24 md:w-32 md:h-32 lg:w-44 lg:h-44 z-0 pointer-events-none transform rotate-12 md:rotate-0">
-            <Image src={Star1} alt="Faded Massive Outline Star watermark" fill className="object-contain" />
+            <Image src={Star5} alt="Faded Massive Outline Star watermark" fill className="object-contain" />
           </div>
 
         </div>

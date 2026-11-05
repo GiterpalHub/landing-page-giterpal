@@ -3,12 +3,11 @@ import Hero from "@/components/sections/Hero";
 import Testimonials from "@/components/sections/Testimonials";
 import Project from "@/components/sections/Project";
 import Article from "@/components/sections/Article";
-import About from "@/components/sections/About";
 import LanyardDivider from "@/components/LanyardDivider";
 
 export default function Home() {
   return (
-    <div className="w-full">
+    <div className="w-full overflow-x-clip">
       <section id="hero">
         <Hero />
       </section>
@@ -24,10 +23,9 @@ export default function Home() {
       <section id="article">
         <Article />
       </section>
-      <section id="about">
-        <About />
-      </section>
+
       <LanyardDivider />
+
       <section id="contact">
         <Contact />
       </section>

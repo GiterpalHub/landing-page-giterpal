@@ -1,6 +1,6 @@
-import React from 'react';
-import { Card, CardContent } from "@/components/ui/card"; 
-import { cn } from "@/lib/utils"; 
+import React from "react";
+import { Card, CardContent } from "@/components/ui/card";
+import { cn } from "@/lib/utils";
 
 interface CardMissionProps {
   number: string;
@@ -9,36 +9,33 @@ interface CardMissionProps {
   className?: string;
 }
 
-const CardMission = ({ 
-  number, 
-  description, 
-  icon, 
-  className 
+const CardMission = ({
+  number,
+  description,
+  icon,
+  className,
 }: CardMissionProps) => {
   return (
-    <Card 
+    <Card
       className={cn(
-        "w-full max-w-[240px] aspect-square relative overflow-hidden border-none shadow-xl",
-        
-        "bg-[#180C37] text-white rounded-[32px]", 
-        
+        "group w-full max-w-[240px] aspect-square relative overflow-hidden border-none shadow-xl",
+        "bg-[#180C37] text-white rounded-[32px]",
         "transition-all duration-300 hover:-rotate-6 hover:shadow-2xl hover:bg-white hover:text-primary",
-        
         className
       )}
     >
-      <CardContent className="flex flex-col justify-between h-full p-8 font-secondary">
+      <CardContent className="flex flex-col justify-between h-full p-6 sm:p-7 md:p-8 font-secondary text-left">
         <div className="flex justify-between items-start">
           <h2 className="text-4xl font-semibold tracking-tighter">
             {number}
           </h2>
-          <div>
+          <div className="flex items-center justify-center">
             {icon}
           </div>
         </div>
 
         <div>
-          <p className="text-lg font-medium leading-snug">
+          <p className="text-left text-base sm:text-lg font-medium leading-snug">
             {description}
           </p>
         </div>

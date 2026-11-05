@@ -1,12 +1,13 @@
 "use client";
 
 import logo from "@/assets/logo.png";
-import { ArrowUpRight, Menu, X } from "lucide-react";
+import { Menu, X } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { useEffect, useState } from "react";
-import IconButton from "../IconButton";
+import { useLenis } from "lenis/react";
 import OutlineButton from "../OutlineButton";
+import InteractiveHoverButton from "../ui/interactive-hover-button";
 
 const navigationItems = [
   { label: "Beranda", href: "/#hero" },
@@ -17,6 +18,7 @@ const navigationItems = [
 ];
 
 export default function Navbar() {
+  const lenis = useLenis();
   const [scrolled, setScrolled] = useState(false);
   const [isOpen, setIsOpen] = useState(false);
 
@@ -29,11 +31,11 @@ export default function Navbar() {
       }
     };
 
-    window.addEventListener("scroll", handleScroll);
+    window.addEventListener("scroll", handleScroll, { passive: true });
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
-  const handleNavClick = (e: React.MouseEvent<HTMLAnchorElement>, href: string) => {
+  const handleNavClick = (e: React.MouseEvent<HTMLElement>, href: string) => {
     setIsOpen(false); 
 
     const isHashLink = href.includes("#");
@@ -45,13 +47,17 @@ export default function Navbar() {
       if (elem) {
         e.preventDefault(); 
         
-        const elementPosition = elem.getBoundingClientRect().top;
-        const offsetPosition = elementPosition + window.scrollY;
-        
-        window.scrollTo({
-          top: offsetPosition,
-          behavior: "smooth"
-        });
+        if (lenis) {
+          lenis.scrollTo(elem, { offset: -20, duration: 1.2 });
+        } else {
+          const elementPosition = elem.getBoundingClientRect().top;
+          const offsetPosition = elementPosition + window.scrollY;
+          
+          window.scrollTo({
+            top: offsetPosition,
+            behavior: "smooth"
+          });
+        }
       }
     }
   };
@@ -110,29 +116,14 @@ export default function Navbar() {
           ))}
         </div>
 
-        <div className="hidden md:flex space-x-3 items-center">
-          <Link href="/#contact" onClick={(e) => handleNavClick(e, "/#contact")}>
-            <OutlineButton
-              className={`${
-                isActive
-                  ? "border-primary text-primary hover:bg-primary hover:text-white"
-                  : "border-white text-white hover:bg-white hover:text-primary"
-              }`}
-            >
-              Kontak Kami
-            </OutlineButton>
-          </Link>
-          <a href="mailto:giterpal@gmail.com">
-            <IconButton
-              className={`${
-                isActive
-                  ? "bg-transparent border border-primary text-primary hover:bg-primary hover:text-white"
-                  : "bg-white text-primary hover:bg-gray-200"
-              }`}
-            >
-              <ArrowUpRight size={18} />
-            </IconButton>
-          </a>
+        <div className="hidden md:flex items-center">
+          <InteractiveHoverButton
+            href="/#contact"
+            onClick={(e) => handleNavClick(e, "/#contact")}
+            variant={isActive ? "nav-active" : "nav-inactive"}
+          >
+            Kontak Kami
+          </InteractiveHoverButton>
         </div>
 
         <button
