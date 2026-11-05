@@ -158,6 +158,10 @@ export default function Contact() {
     [startInertiaLoop]
   );
 
+  const lenis = useLenis();
+  const lenisRef = useRef(lenis);
+  lenisRef.current = lenis;
+
   useLenis(({ scroll }) => {
     handleScrollDelta(scroll);
   });
@@ -167,7 +171,9 @@ export default function Contact() {
     renderTrackPosition();
 
     const onNativeScroll = () => {
-      handleScrollDelta(window.scrollY);
+      if (!lenisRef.current) {
+        handleScrollDelta(window.scrollY);
+      }
     };
 
     window.addEventListener("scroll", onNativeScroll, { passive: true });
