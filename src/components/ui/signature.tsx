@@ -10,10 +10,10 @@ import {
   useState,
 } from "react";
 import { motion } from "framer-motion";
-import type { Font } from "opentype.js";
+import * as opentype from "opentype.js";
 import { cn } from "@/lib/utils";
 
-export interface SignatureRef {
+export interface SignatureHandle {
   setProgress: (progress: number) => void;
 }
 
@@ -24,117 +24,118 @@ export interface SignatureProps {
   color?: string;
   /** Font size of the signature */
   fontSize?: number;
-  /** Animation duration in seconds (for time-based animation) */
+  /** Animation duration in seconds (when not scroll-driven) */
   duration?: number;
-  /** Delay before animation starts in seconds (for time-based animation) */
+  /** Delay before animation starts in seconds (when not scroll-driven) */
   delay?: number;
-  /** Direct scroll progress between 0 and 1 (enables scroll-driven animation) */
-  scrollProgress?: number;
   /** Additional CSS classes */
   className?: string;
-  /** Only animate when in view (for time-based animation) */
+  /** Only animate when in view */
   inView?: boolean;
-  /** Only animate once (for time-based animation) */
+  /** Only animate once */
   once?: boolean;
   /** Custom font URL to load */
   fontUrl?: string;
+  /** Enable manual scroll-driven progress (0 to 1) via ref.setProgress or progress prop */
+  scrollDriven?: boolean;
+  /** Optional controlled progress (0 to 1) when scrollDriven is true */
+  progress?: number;
 }
 
-export const Signature = forwardRef<SignatureRef, SignatureProps>(
-  (
+function smoothstep(edge0: number, edge1: number, x: number) {
+  const t = Math.max(0, Math.min(1, (x - edge0) / (edge1 - edge0)));
+  return t * t * (3 - 2 * t);
+}
+
+export const Signature = forwardRef<SignatureHandle, SignatureProps>(
+  function Signature(
     {
       text = "Signature",
       color = "currentColor",
       fontSize = 32,
       duration = 1.5,
       delay = 0,
-      scrollProgress,
       className,
       inView = false,
       once = true,
       fontUrl,
+      scrollDriven = false,
+      progress,
     },
     ref
-  ) => {
-    const [paths, setPaths] = useState<string[]>([]);
+  ) {
+    // Store only non-empty character paths so spaces don't create dead time gaps
+    const [glyphPaths, setGlyphPaths] = useState<string[]>([]);
     const [width, setWidth] = useState<number>(300);
+
     const height = fontSize * 3;
     const horizontalPadding = fontSize * 0.15;
     const topMargin = fontSize * 1.5;
     const baseline = topMargin;
     const maskId = `signature-reveal-${useId().replace(/:/g, "")}`;
 
-    const isScrollDriven = scrollProgress !== undefined || ref !== null;
-
     const maskPathRefs = useRef<(SVGPathElement | null)[]>([]);
-    const outlinePathRefs = useRef<(SVGPathElement | null)[]>([]);
-    const validIndicesRef = useRef<number[]>([]);
-    const currentProgressRef = useRef<number>(scrollProgress ?? 0);
+    const strokePathRefs = useRef<(SVGPathElement | null)[]>([]);
+    const currentProgressRef = useRef<number>(progress ?? 0);
 
-    const applyProgress = useCallback((p: number) => {
-      currentProgressRef.current = p;
-      const valid = validIndicesRef.current;
-      const count = valid.length;
-      if (count === 0) return;
+    const applyProgressToDOM = useCallback(
+      (rawProgress: number, count: number) => {
+        const clamped = Math.max(0, Math.min(1, rawProgress));
+        currentProgressRef.current = clamped;
 
-      const clampedP = Math.max(0, Math.min(1, p));
-      const charSpan = 1.35 / count;
+        if (count <= 0) return;
 
-      valid.forEach((charIndex, i) => {
-        const startI = (i / count) * (1 - charSpan * 0.25);
-        const charP = Math.max(0, Math.min(1, (clampedP - startI) / charSpan));
-        const offset = (1 - charP).toFixed(4);
-        const opacity = charP > 0.005 ? "1" : "0";
+        // Overlap consecutive character strokes slightly so cursive script flows naturally
+        const overlap = 0.28;
+        const effectiveTotal = count - overlap * (count - 1);
+        const charWindow = 1 / Math.max(1, effectiveTotal);
 
-        const maskEl = maskPathRefs.current[charIndex];
-        if (maskEl) {
-          maskEl.style.strokeDashoffset = offset;
-          maskEl.style.opacity = opacity;
+        for (let i = 0; i < count; i++) {
+          const charStart = i * (1 - overlap) * charWindow;
+          const localRaw = (clamped - charStart) / charWindow;
+          const charProgress = smoothstep(0, 1, localRaw);
+
+          const dashOffset = (1 - charProgress).toFixed(4);
+          const opacity = charProgress > 0.003 ? "1" : "0";
+
+          const maskEl = maskPathRefs.current[i];
+          if (maskEl) {
+            maskEl.style.strokeDashoffset = dashOffset;
+            maskEl.style.opacity = opacity;
+          }
+
+          const strokeEl = strokePathRefs.current[i];
+          if (strokeEl) {
+            strokeEl.style.strokeDashoffset = dashOffset;
+            strokeEl.style.opacity = opacity;
+          }
         }
-
-        const outlineEl = outlinePathRefs.current[charIndex];
-        if (outlineEl) {
-          outlineEl.style.strokeDashoffset = offset;
-          outlineEl.style.opacity = opacity;
-        }
-      });
-    }, []);
+      },
+      []
+    );
 
     useImperativeHandle(
       ref,
       () => ({
         setProgress: (p: number) => {
-          applyProgress(p);
+          applyProgressToDOM(p, glyphPaths.length);
         },
       }),
-      [applyProgress]
+      [applyProgressToDOM, glyphPaths.length]
     );
 
     useEffect(() => {
-      if (scrollProgress !== undefined) {
-        applyProgress(scrollProgress);
+      if (scrollDriven && typeof progress === "number") {
+        applyProgressToDOM(progress, glyphPaths.length);
       }
-    }, [scrollProgress, applyProgress]);
+    }, [scrollDriven, progress, glyphPaths.length, applyProgressToDOM]);
 
     useEffect(() => {
       let isCancelled = false;
 
       async function load() {
         try {
-          const otModule = await import("opentype.js");
-          const otUnknown: unknown = otModule;
-          const otDefault = (
-            otUnknown as { default?: { parse?: (buffer: ArrayBuffer) => Font } }
-          )?.default;
-          const parseFont =
-            otDefault?.parse ??
-            (otUnknown as { parse?: (buffer: ArrayBuffer) => Font }).parse;
-
-          if (!parseFont) {
-            throw new Error("opentype parse function not found");
-          }
-
-          let font: Font | undefined;
+          let font: opentype.Font | undefined;
           const fontPaths = fontUrl
             ? [fontUrl]
             : [
@@ -147,7 +148,7 @@ export const Signature = forwardRef<SignatureRef, SignatureProps>(
               const res = await fetch(path);
               if (!res.ok) continue;
               const buffer = await res.arrayBuffer();
-              font = parseFont(buffer);
+              font = opentype.parse(buffer);
               if (font) break;
             } catch {
               // Try next fallback path
@@ -161,18 +162,14 @@ export const Signature = forwardRef<SignatureRef, SignatureProps>(
           if (isCancelled) return;
 
           let x = horizontalPadding;
-          const newPaths: string[] = [];
-          const validIndices: number[] = [];
+          const nonEmptyPaths: string[] = [];
 
-          for (let i = 0; i < text.length; i++) {
-            const char = text[i];
+          for (const char of text) {
             const glyph = font.charToGlyph(char);
             const path = glyph.getPath(x, baseline, fontSize);
-            const pathData = path.toPathData(3);
-            newPaths.push(pathData);
-
-            if (pathData && pathData.trim().length > 0) {
-              validIndices.push(i);
+            const d = path.toPathData(3);
+            if (d && d.trim().length > 0) {
+              nonEmptyPaths.push(d);
             }
 
             const advanceWidth = glyph.advanceWidth ?? font.unitsPerEm;
@@ -180,14 +177,13 @@ export const Signature = forwardRef<SignatureRef, SignatureProps>(
           }
 
           if (!isCancelled) {
-            validIndicesRef.current = validIndices;
-            setPaths(newPaths);
+            setGlyphPaths(nonEmptyPaths);
             setWidth(Math.max(1, x + horizontalPadding));
           }
         } catch (error) {
           console.error("Signature component font load error:", error);
           if (!isCancelled) {
-            setPaths([]);
+            setGlyphPaths([]);
             setWidth(text.length * fontSize * 0.6);
           }
         }
@@ -200,107 +196,92 @@ export const Signature = forwardRef<SignatureRef, SignatureProps>(
       };
     }, [text, fontSize, baseline, horizontalPadding, fontUrl]);
 
-    // Apply latest progress whenever paths finish loading
+    // Sync DOM immediately once glyphPaths are populated in scrollDriven mode
     useEffect(() => {
-      if (paths.length > 0 && isScrollDriven) {
-        applyProgress(currentProgressRef.current);
+      if (scrollDriven && glyphPaths.length > 0) {
+        applyProgressToDOM(currentProgressRef.current, glyphPaths.length);
       }
-    }, [paths, isScrollDriven, applyProgress]);
+    }, [scrollDriven, glyphPaths, applyProgressToDOM]);
+
+    if (scrollDriven) {
+      return (
+        <svg
+          width={width}
+          height={height}
+          viewBox={`0 0 ${width} ${height}`}
+          fill="none"
+          aria-label={text}
+          className={cn(
+            "text-foreground overflow-visible max-w-full h-auto",
+            className
+          )}
+        >
+          <defs>
+            <mask id={maskId} maskUnits="userSpaceOnUse">
+              {glyphPaths.map((d, i) => (
+                <path
+                  key={i}
+                  ref={(el) => {
+                    maskPathRefs.current[i] = el;
+                  }}
+                  d={d}
+                  stroke="white"
+                  strokeWidth={fontSize * 0.24}
+                  fill="none"
+                  pathLength={1}
+                  strokeDasharray="1"
+                  strokeDashoffset="1"
+                  style={{ opacity: 0 }}
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                />
+              ))}
+            </mask>
+          </defs>
+
+          {glyphPaths.map((d, i) => (
+            <path
+              key={i}
+              ref={(el) => {
+                strokePathRefs.current[i] = el;
+              }}
+              d={d}
+              stroke={color}
+              strokeWidth={2.2}
+              fill="none"
+              pathLength={1}
+              strokeDasharray="1"
+              strokeDashoffset="1"
+              style={{ opacity: 0 }}
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            />
+          ))}
+
+          <g mask={`url(#${maskId})`}>
+            {glyphPaths.map((d, i) => (
+              <path key={i} d={d} fill={color} />
+            ))}
+          </g>
+        </svg>
+      );
+    }
 
     const variants = {
       hidden: { pathLength: 0, opacity: 0 },
       visible: { pathLength: 1, opacity: 1 },
     };
 
-    if (isScrollDriven) {
-      return (
-        <svg
-          key={paths.length}
-          width={width}
-          height={height}
-          viewBox={`0 0 ${width} ${height}`}
-          fill="none"
-          className={cn(
-            "text-foreground overflow-visible max-w-full h-auto select-none pointer-events-none",
-            className
-          )}
-        >
-          <defs>
-            <mask id={maskId} maskUnits="userSpaceOnUse">
-              {paths.map((d, i) => {
-                if (!d) return null;
-                return (
-                  <path
-                    key={i}
-                    ref={(el) => {
-                      maskPathRefs.current[i] = el;
-                    }}
-                    d={d}
-                    stroke="white"
-                    strokeWidth={fontSize * 0.24}
-                    fill="none"
-                    pathLength={1}
-                    strokeDasharray="1 1"
-                    vectorEffect="non-scaling-stroke"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    style={{
-                      strokeDashoffset: 1,
-                      opacity: 0,
-                    }}
-                  />
-                );
-              })}
-            </mask>
-          </defs>
-
-          {/* Leading pen outline strokes */}
-          {paths.map((d, i) => {
-            if (!d) return null;
-            return (
-              <path
-                key={i}
-                ref={(el) => {
-                  outlinePathRefs.current[i] = el;
-                }}
-                d={d}
-                stroke={color}
-                strokeWidth={2}
-                fill="none"
-                pathLength={1}
-                strokeDasharray="1 1"
-                vectorEffect="non-scaling-stroke"
-                strokeLinecap="butt"
-                strokeLinejoin="round"
-                style={{
-                  strokeDashoffset: 1,
-                  opacity: 0,
-                }}
-              />
-            );
-          })}
-
-          {/* Masked filled cursive letters */}
-          <g mask={`url(#${maskId})`}>
-            {paths.map((d, i) => {
-              if (!d) return null;
-              return <path key={i} d={d} fill={color} />;
-            })}
-          </g>
-        </svg>
-      );
-    }
-
-    // Default time-based animation mode
     return (
       <motion.svg
-        key={paths.length}
+        key={glyphPaths.length}
         width={width}
         height={height}
         viewBox={`0 0 ${width} ${height}`}
         fill="none"
+        aria-label={text}
         className={cn(
-          "text-foreground overflow-visible max-w-full h-auto select-none pointer-events-none",
+          "text-foreground overflow-visible max-w-full h-auto",
           className
         )}
         initial="hidden"
@@ -310,75 +291,66 @@ export const Signature = forwardRef<SignatureRef, SignatureProps>(
       >
         <defs>
           <mask id={maskId} maskUnits="userSpaceOnUse">
-            {paths.map((d, i) => {
-              if (!d) return null;
-              return (
-                <motion.path
-                  key={i}
-                  d={d}
-                  stroke="white"
-                  strokeWidth={fontSize * 0.22}
-                  fill="none"
-                  variants={variants}
-                  transition={{
-                    pathLength: {
-                      delay: delay + i * 0.14,
-                      duration,
-                      ease: "easeInOut",
-                    },
-                    opacity: {
-                      delay: delay + i * 0.14 + 0.01,
-                      duration: 0.01,
-                    },
-                  }}
-                  vectorEffect="non-scaling-stroke"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                />
-              );
-            })}
+            {glyphPaths.map((d, i) => (
+              <motion.path
+                key={i}
+                d={d}
+                stroke="white"
+                strokeWidth={fontSize * 0.22}
+                fill="none"
+                variants={variants}
+                transition={{
+                  pathLength: {
+                    delay: delay + i * 0.14,
+                    duration,
+                    ease: "easeInOut",
+                  },
+                  opacity: {
+                    delay: delay + i * 0.14 + 0.01,
+                    duration: 0.01,
+                  },
+                }}
+                vectorEffect="non-scaling-stroke"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              />
+            ))}
           </mask>
         </defs>
 
-        {paths.map((d, i) => {
-          if (!d) return null;
-          return (
-            <motion.path
-              key={i}
-              d={d}
-              stroke={color}
-              strokeWidth={2}
-              fill="none"
-              variants={variants}
-              transition={{
-                pathLength: {
-                  delay: delay + i * 0.14,
-                  duration,
-                  ease: "easeInOut",
-                },
-                opacity: {
-                  delay: delay + i * 0.14 + 0.01,
-                  duration: 0.01,
-                },
-              }}
-              vectorEffect="non-scaling-stroke"
-              strokeLinecap="butt"
-              strokeLinejoin="round"
-            />
-          );
-        })}
+        {glyphPaths.map((d, i) => (
+          <motion.path
+            key={i}
+            d={d}
+            stroke={color}
+            strokeWidth={2}
+            fill="none"
+            variants={variants}
+            transition={{
+              pathLength: {
+                delay: delay + i * 0.14,
+                duration,
+                ease: "easeInOut",
+              },
+              opacity: {
+                delay: delay + i * 0.14 + 0.01,
+                duration: 0.01,
+              },
+            }}
+            vectorEffect="non-scaling-stroke"
+            strokeLinecap="butt"
+            strokeLinejoin="round"
+          />
+        ))}
 
         <g mask={`url(#${maskId})`}>
-          {paths.map((d, i) => {
-            if (!d) return null;
-            return <path key={i} d={d} fill={color} />;
-          })}
+          {glyphPaths.map((d, i) => (
+            <path key={i} d={d} fill={color} />
+          ))}
         </g>
       </motion.svg>
     );
   }
 );
-
-Signature.displayName = "Signature";
 
 export default Signature;

@@ -4,7 +4,7 @@ import { useCallback, useEffect, useRef } from "react";
 import Image from "next/image";
 import { useLenis } from "lenis/react";
 import Avatar from "@/assets/Avatar.png";
-import Signature, { type SignatureRef } from "../ui/signature";
+import Signature, { type SignatureHandle } from "../ui/signature";
 
 const testimonialsData = [
   {
@@ -97,7 +97,7 @@ function smoothstep(edge0: number, edge1: number, x: number) {
 export default function Testimonials() {
   const containerRef = useRef<HTMLDivElement>(null);
   const headingWrapRef = useRef<HTMLDivElement>(null);
-  const signatureRef = useRef<SignatureRef>(null);
+  const signatureRef = useRef<SignatureHandle>(null);
   const cardRefs = useRef<(HTMLDivElement | null)[]>([]);
 
   const updateScene = useCallback(() => {
@@ -114,20 +114,28 @@ export default function Testimonials() {
     const progress = Math.max(0, Math.min(1, scrolled / scrollDistance));
 
     // Phase timings aligned so all cards finish before Article's -mt-[105vh] covers the viewport at ~0.75
-    const PHASE_SIGNATURE_END = 0.16;
-    const PHASE_ZOOM_START = 0.16;
-    const PHASE_ZOOM_END = 0.28;
-    const PHASE_CARDS_START = 0.19;
+    const PHASE_TYPING_END = 0.18;
+    const PHASE_ZOOM_START = 0.21;
+    const PHASE_ZOOM_END = 0.32;
+    const PHASE_CARDS_START = 0.24;
     const PHASE_CARDS_END = 0.76;
 
-    // 1. Signature drawing progress: scrubbed in real-time as the user scrolls
-    const signatureProgress = Math.max(
+    // Scroll-driven handwriting progress:
+    // Starts drawing as the centered heading rises into the lower-middle viewport (-0.22 * vh)
+    // and completes while pinned at center (PHASE_TYPING_END * scrollDistance)
+    const typingStartScrolled = -0.22 * vh;
+    const typingEndScrolled = PHASE_TYPING_END * scrollDistance;
+    const typingProgress = Math.max(
       0,
-      Math.min(1, progress / PHASE_SIGNATURE_END)
+      Math.min(
+        1,
+        (scrolled - typingStartScrolled) /
+          Math.max(1, typingEndScrolled - typingStartScrolled)
+      )
     );
-    signatureRef.current?.setProgress(signatureProgress);
+    signatureRef.current?.setProgress(typingProgress);
 
-    // 2. Heading zoom-through transition into 3D space
+    // Heading zoom-through transition into 3D space
     if (headingWrapRef.current) {
       if (progress <= PHASE_ZOOM_START) {
         headingWrapRef.current.style.opacity = "1";
@@ -150,7 +158,7 @@ export default function Testimonials() {
       }
     }
 
-    // 3. Update 3D fly-through cards continuously (pure preserve-3d)
+    // Update 3D fly-through cards continuously (pure preserve-3d)
     const rawCardsProgress =
       (progress - PHASE_CARDS_START) / (PHASE_CARDS_END - PHASE_CARDS_START);
     const cardsProgress = Math.max(0, Math.min(1.08, rawCardsProgress));
@@ -216,7 +224,7 @@ export default function Testimonials() {
         className="sticky top-0 h-screen w-full overflow-hidden flex items-center justify-center"
         style={{ perspective: "800px" }}
       >
-        {/* Center Heading ("Apa Kata Mereka" with scroll-driven Signature) */}
+        {/* Center Heading ("Apa Kata Mereka" with Componentry Signature handwriting effect) */}
         <div
           ref={headingWrapRef}
           className="absolute z-50 flex flex-col items-center justify-center pointer-events-none text-center px-4 w-full will-change-transform"
@@ -226,6 +234,7 @@ export default function Testimonials() {
             text="Apa Kata Mereka"
             color="#FFFFFF"
             fontSize={72}
+            scrollDriven={true}
             className="max-w-[92vw] sm:max-w-2xl md:max-w-3xl lg:max-w-4xl h-auto drop-shadow-[0_8px_32px_rgba(17,12,76,0.65)]"
           />
         </div>
