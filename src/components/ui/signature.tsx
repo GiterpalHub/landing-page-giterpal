@@ -68,9 +68,9 @@ export const Signature = forwardRef<SignatureHandle, SignatureProps>(
     const [glyphPaths, setGlyphPaths] = useState<string[]>([]);
     const [width, setWidth] = useState<number>(300);
 
-    const height = fontSize * 3;
-    const horizontalPadding = fontSize * 0.15;
-    const topMargin = fontSize * 1.5;
+    const height = fontSize * 4.2;
+    const horizontalPadding = fontSize * 0.2;
+    const topMargin = fontSize * 2.5;
     const baseline = topMargin;
     const maskId = `signature-reveal-${useId().replace(/:/g, "")}`;
 
@@ -330,7 +330,14 @@ export const Signature = forwardRef<SignatureHandle, SignatureProps>(
                 <feMergeNode in="SourceGraphic" />
               </feMerge>
             </filter>
-            <mask id={maskId} maskUnits="userSpaceOnUse">
+            <mask
+              id={maskId}
+              maskUnits="userSpaceOnUse"
+              x={-200}
+              y={-200}
+              width={width + 400}
+              height={height + 400}
+            >
               {glyphPaths.map((d, i) => (
                 <path
                   key={i}
@@ -339,7 +346,7 @@ export const Signature = forwardRef<SignatureHandle, SignatureProps>(
                   }}
                   d={d}
                   stroke="white"
-                  strokeWidth={fontSize * 0.25}
+                  strokeWidth={fontSize * 0.32}
                   fill="none"
                   pathLength={1}
                   strokeDasharray="1"
@@ -433,13 +440,20 @@ export const Signature = forwardRef<SignatureHandle, SignatureProps>(
         viewport={{ once }}
       >
         <defs>
-          <mask id={maskId} maskUnits="userSpaceOnUse">
+          <mask
+            id={maskId}
+            maskUnits="userSpaceOnUse"
+            x={-200}
+            y={-200}
+            width={width + 400}
+            height={height + 400}
+          >
             {glyphPaths.map((d, i) => (
               <motion.path
                 key={i}
                 d={d}
                 stroke="white"
-                strokeWidth={fontSize * 0.22}
+                strokeWidth={fontSize * 0.32}
                 fill="none"
                 variants={variants}
                 transition={{
