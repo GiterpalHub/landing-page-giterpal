@@ -84,9 +84,11 @@ export const BlurOutUp = ({
     backgroundColor: background,
   };
 
+  const Comp = Component as React.ElementType;
+
   return (
-    <Component
-      ref={containerRef as any}
+    <Comp
+      ref={containerRef}
       className={cn("inline-block", className)}
       style={inlineStyles}
     >
@@ -151,7 +153,7 @@ export const BlurOutUp = ({
       ) : (
         children
       )}
-    </Component>
+    </Comp>
   );
 };
 
