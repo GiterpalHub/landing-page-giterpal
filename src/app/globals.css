@@ -21,6 +21,22 @@
     animation: pulse 4s cubic-bezier(0.4, 0, 0.6, 1) infinite;
   }
 
+  .animate-rocket-flare {
+    animation: rocketFlareFlicker 0.5s ease-in-out infinite;
+  }
+
+  .animate-lanyard-1 {
+    animation: lanyardSway1 5.5s ease-in-out infinite alternate;
+  }
+
+  .animate-lanyard-2 {
+    animation: lanyardSway2 6s ease-in-out infinite alternate;
+  }
+
+  .animate-lanyard-3 {
+    animation: lanyardSway3 5s ease-in-out infinite alternate;
+  }
+
   .animate-fade-in-up {
     animation: fadeInUp 1s ease-out forwards;
     opacity: 0;
@@ -38,6 +54,15 @@
 }
 
 @layer base {
+  html.lenis,
+  html.lenis body {
+    height: auto;
+  }
+
+  .lenis.lenis-smooth {
+    scroll-behavior: auto !important;
+  }
+
   :root {
     --background: 0 0% 100%;
     --foreground: 0 0% 3.9%;
@@ -119,5 +144,42 @@
   to {
     opacity: 1;
     transform: translateY(0);
+  }
+}
+
+@keyframes rocketFlareFlicker {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.2;
+  }
+}
+
+@keyframes lanyardSway1 {
+  0% {
+    transform: translate3d(-3vw, 0, 0);
+  }
+  100% {
+    transform: translate3d(3vw, 0, 0);
+  }
+}
+
+@keyframes lanyardSway2 {
+  0% {
+    transform: translate3d(3vw, 0, 0);
+  }
+  100% {
+    transform: translate3d(-3vw, 0, 0);
+  }
+}
+
+@keyframes lanyardSway3 {
+  0% {
+    transform: translate3d(-2.5vw, 0, 0);
+  }
+  100% {
+    transform: translate3d(2.5vw, 0, 0);
   }
 }
