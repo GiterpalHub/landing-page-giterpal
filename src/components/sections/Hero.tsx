@@ -634,13 +634,15 @@ export default function Hero() {
               alt="Giterpal Rocket Launch"
               width={1536}
               height={1114}
-              className="w-full h-auto object-contain drop-shadow-[0_14px_38px_rgba(8,6,42,0.55)]"
+              unoptimized
+              className="w-full h-auto object-contain"
               priority
             />
             <Image
               src={FlareRocket}
               alt=""
               aria-hidden="true"
+              unoptimized
               className="
                 absolute left-[72.2%] top-[37.5%] -translate-x-1/2 -translate-y-1/2
                 w-[62%] h-auto object-contain pointer-events-none select-none

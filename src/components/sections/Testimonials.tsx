@@ -10,7 +10,7 @@ import Signature, { type SignatureHandle } from "../ui/signature";
 const testimonialsData = [
   {
     id: 1,
-    name: "ARDHANA",
+    name: "FARHAN",
     text: "Komunitas yang sangat suportif untuk eksplorasi teknologi baru dan kolaborasi proyek nyata.",
     x: -16,
     y: -12,
@@ -18,7 +18,7 @@ const testimonialsData = [
   },
   {
     id: 2,
-    name: "ALPIN",
+    name: "NADIA",
     text: "Diskusi UI/UX dan arsitektur frontend di Giterpal bikin skill ngoding naik level jauh lebih cepat!",
     x: 18,
     y: 12,
@@ -27,7 +27,7 @@ const testimonialsData = [
   {
     id: 3,
     name: "FAJAR",
-    text: "Tempat terbaik buat mengubah ide desain dari sekadar prototipe Figma menjadi produk digital utuh.",
+    text: "Asikkk bangett acaranya seru parah, gasabar nunggu project collab berikutnyaaa!",
     x: -20,
     y: 14,
     z: -2200,
@@ -59,14 +59,14 @@ const testimonialsData = [
   {
     id: 7,
     name: "LINDA",
-    text: "Integrasi API dan perancangan database jadi jauh lebih mudah dipahami lewat sesi mentoring.",
+    text: "Keren bgttt gasabar ikutan sesi workshop selanjutnya, seru polll komunitasnya!",
     x: -18,
     y: 16,
     z: -5200,
   },
   {
     id: 8,
-    name: "DANI",
+    name: "ILHAM",
     text: "Ekosistem belajar yang seru, penuh inovasi, dan selalu relevan dengan kebutuhan teknologi saat ini.",
     x: 16,
     y: -12,
@@ -82,8 +82,8 @@ const testimonialsData = [
   },
   {
     id: 10,
-    name: "YANTI",
-    text: "Sangat terinspirasi dengan semangat teman-teman TRPL dalam memecahkan masalah lewat teknologi!",
+    name: "NISA",
+    text: "Vibes-nya asik parahhh, seneng bgt nemu komunitas yang sefrekuensi kek gini!",
     x: 14,
     y: -6,
     z: -7450,
