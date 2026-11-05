@@ -1,12 +1,11 @@
 "use client";
 
 import logo from "@/assets/logo.png";
-import { ArrowUpRight, Menu, X } from "lucide-react";
+import { Menu, X } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { useLenis } from "lenis/react";
-import IconButton from "../IconButton";
 import OutlineButton from "../OutlineButton";
 import InteractiveHoverButton from "../ui/interactive-hover-button";
 
@@ -36,7 +35,7 @@ export default function Navbar() {
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
-  const handleNavClick = (e: React.MouseEvent<HTMLAnchorElement>, href: string) => {
+  const handleNavClick = (e: React.MouseEvent<HTMLElement>, href: string) => {
     setIsOpen(false); 
 
     const isHashLink = href.includes("#");
