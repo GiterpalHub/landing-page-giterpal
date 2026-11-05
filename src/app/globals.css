@@ -54,6 +54,10 @@
 }
 
 @layer base {
+  html {
+    scroll-behavior: auto !important;
+  }
+
   html.lenis,
   html.lenis body {
     height: auto;

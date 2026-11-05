@@ -11,14 +11,17 @@ export default function SmoothScroll({
   return (
     <ReactLenis
       root
+      autoRaf
       options={{
-        duration: 1.25,
-        easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
+        lerp: 0.06, // True physics damping for a pronounced, velvety gliding momentum
+        wheelMultiplier: 1.2, // Effortless glide distance per wheel tick
+        touchMultiplier: 1.8,
+        smoothWheel: true,
+        syncTouch: true, // Smooth inertia on touchpads/trackpads
+        syncTouchLerp: 0.07,
+        touchInertiaExponent: 1.75,
         orientation: "vertical",
         gestureOrientation: "vertical",
-        smoothWheel: true,
-        wheelMultiplier: 1.05,
-        touchMultiplier: 1.5,
       }}
     >
       {children}
