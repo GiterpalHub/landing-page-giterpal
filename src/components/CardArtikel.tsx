@@ -1,4 +1,3 @@
-import { CalendarDays, UserRound } from "lucide-react";
 import Image, { StaticImageData } from "next/image";
 import Link from "next/link";
 
@@ -8,7 +7,7 @@ interface CardArtikelProps {
   coverImage: StaticImageData | string;
   title: string;
   category: string;
-  author: string;
+  author?: string;
   date: string;
   excerpt: string;
   slug: string;
@@ -20,7 +19,6 @@ const CardArtikel = ({
   coverImage,
   title,
   category,
-  author,
   date,
   excerpt,
   slug,
