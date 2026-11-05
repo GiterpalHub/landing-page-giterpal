@@ -1,273 +1,351 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef } from "react";
 import Image from "next/image";
+import { useLenis } from "lenis/react";
 import Avatar from "@/assets/Avatar.png";
 
 const testimonialsData = [
   {
     id: 1,
     name: "ARDHANA",
-    role: "Mahasiswa",
-    text: "Mantap aplikasinya...",
-    x: 10,
-    y: -10,
-    z: 0,
+    role: "Mahasiswa TRPL",
+    text: "Komunitas yang sangat suportif untuk eksplorasi teknologi baru dan kolaborasi proyek nyata.",
+    x: -16,
+    y: -12,
+    z: -700,
   },
   {
     id: 2,
     name: "ALPIN",
-    role: "Developer",
-    text: "UI/UX memanjakan mata...",
-    x: -20,
-    y: 15,
-    z: -1000,
+    role: "Frontend Developer",
+    text: "Diskusi UI/UX dan arsitektur frontend di Giterpal bikin skill ngoding naik level jauh lebih cepat!",
+    x: 18,
+    y: 12,
+    z: -1450,
   },
   {
     id: 3,
     name: "FAJAR",
-    role: "Designer",
-    text: "Animasi smooth banget...",
-    x: 25,
-    y: 5,
-    z: -2000,
+    role: "UI/UX Designer",
+    text: "Tempat terbaik buat mengubah ide desain dari sekadar prototipe Figma menjadi produk digital utuh.",
+    x: -20,
+    y: 14,
+    z: -2200,
   },
   {
     id: 4,
     name: "SITI",
     role: "Product Manager",
-    text: "Sangat membantu...",
-    x: -15,
-    y: -20,
-    z: -3000,
+    text: "Alur kerja tim dan manajemen proyek di komunitas ini benar-benar melatih kesiapan industri.",
+    x: 15,
+    y: -15,
+    z: -2950,
   },
   {
     id: 5,
     name: "BUDI",
     role: "Tech Lead",
-    text: "Code structure rapi...",
-    x: 20,
-    y: 25,
-    z: -4000,
+    text: "Budaya code review dan berbagi ilmu di Giterpal Hub membantu menjaga standar kode tetap rapi.",
+    x: -14,
+    y: -8,
+    z: -3700,
   },
   {
     id: 6,
     name: "RIZKY",
-    role: "Frontend",
-    text: "Belajar banyak dari sini...",
-    x: 0,
-    y: 0,
-    z: -5000,
+    role: "Web Developer",
+    text: "Berawal dari belajar bareng, sekarang sudah berani bangun dan rilis aplikasi web sendiri.",
+    x: 20,
+    y: 8,
+    z: -4450,
   },
   {
     id: 7,
     name: "LINDA",
-    role: "Backend Dev",
-    text: "API integration mudah...",
-    x: -30,
-    y: 10,
-    z: -6000,
+    role: "Backend Engineer",
+    text: "Integrasi API dan perancangan database jadi jauh lebih mudah dipahami lewat sesi mentoring.",
+    x: -18,
+    y: 16,
+    z: -5200,
   },
   {
     id: 8,
     name: "DANI",
-    role: "Fullstack",
-    text: "Teknologi powerful...",
-    x: 15,
-    y: -15,
-    z: -7000,
+    role: "Fullstack Developer",
+    text: "Ekosistem belajar yang seru, penuh inovasi, dan selalu relevan dengan kebutuhan teknologi saat ini.",
+    x: 16,
+    y: -12,
+    z: -5950,
   },
   {
     id: 9,
     name: "EKA",
     role: "QA Engineer",
-    text: "Bug free!...",
-    x: -10,
-    y: 20,
-    z: -8000,
+    text: "Kolaborasi lintas divisi yang solid membuat setiap rilis karya komunitas terasa lebih matang.",
+    x: -15,
+    y: 10,
+    z: -6700,
   },
   {
     id: 10,
     name: "YANTI",
-    role: "Data Analyst",
-    text: "Visualisasi informatif...",
-    x: 30,
-    y: -5,
-    z: -9000,
+    role: "Data Enthusiast",
+    text: "Sangat terinspirasi dengan semangat teman-teman TRPL dalam memecahkan masalah lewat teknologi!",
+    x: 14,
+    y: -6,
+    z: -7450,
   },
 ];
 
-const HEADING_TEXT = "Apa Kata Mereka";
+const HEADING_WORDS = ["Apa", "Kata", "Mereka"];
+
+function smoothstep(edge0: number, edge1: number, x: number) {
+  const t = Math.max(0, Math.min(1, (x - edge0) / (edge1 - edge0)));
+  return t * t * (3 - 2 * t);
+}
 
 export default function Testimonials() {
   const containerRef = useRef<HTMLDivElement>(null);
-  const [scrollProgress, setScrollProgress] = useState(0);
+  const headingWrapRef = useRef<HTMLDivElement>(null);
+  const letterRefs = useRef<(HTMLSpanElement | null)[]>([]);
+  const cardRefs = useRef<(HTMLDivElement | null)[]>([]);
+
+  // Total characters including spaces between words
+  const totalChars = HEADING_WORDS.join(" ").length;
+
+  const updateScene = useCallback(() => {
+    const container = containerRef.current;
+    if (!container) return;
+
+    const rect = container.getBoundingClientRect();
+    const vh = window.innerHeight || 1;
+    const vw = window.innerWidth || 1;
+    const isMobile = vw < 768;
+
+    const scrollDistance = Math.max(1, rect.height - vh);
+    const scrolled = -rect.top;
+    const progress = Math.max(0, Math.min(1, scrolled / scrollDistance));
+
+    // Start typing slightly before the sticky container locks at top: 0
+    // so the user never sees a static ghosted heading while scrolling in
+    const entryLead = Math.max(0, Math.min(1, (vh * 0.55 - rect.top) / (vh * 0.55 + scrollDistance * 0.16)));
+
+    // Phase timings (aligned so all cards finish before Article's -mt-[105vh] covers the viewport at ~0.75)
+    const PHASE_ZOOM_START = 0.16;
+    const PHASE_ZOOM_END = 0.28;
+    const PHASE_CARDS_START = 0.19;
+    const PHASE_CARDS_END = 0.76;
+
+    // 1. Update individual letters of "Apa Kata Mereka"
+    const exactCharPos = entryLead * totalChars;
+    letterRefs.current.forEach((span, idx) => {
+      if (!span) return;
+      // Smooth per-character activation instead of binary step
+      const charProgress = Math.max(0, Math.min(1, (exactCharPos - idx + 1.2) / 1.8));
+      const easedChar = charProgress * charProgress * (3 - 2 * charProgress);
+
+      const opacity = 0.14 + easedChar * 0.86;
+      const translateY = (1 - easedChar) * 14;
+      const scale = 0.88 + easedChar * 0.12;
+
+      span.style.opacity = opacity.toFixed(3);
+      span.style.transform = `translate3d(0, ${translateY.toFixed(1)}px, 0) scale(${scale.toFixed(3)})`;
+    });
+
+    // 2. Update heading zoom-through transition
+    if (headingWrapRef.current) {
+      if (progress <= PHASE_ZOOM_START) {
+        headingWrapRef.current.style.opacity = "1";
+        headingWrapRef.current.style.transform = "translate3d(0, 0, 0) scale(1)";
+        headingWrapRef.current.style.visibility = "visible";
+      } else if (progress >= PHASE_ZOOM_END) {
+        headingWrapRef.current.style.opacity = "0";
+        headingWrapRef.current.style.visibility = "hidden";
+      } else {
+        const zoomT = (progress - PHASE_ZOOM_START) / (PHASE_ZOOM_END - PHASE_ZOOM_START);
+        const easedZoom = zoomT * zoomT;
+        const scale = 1 + easedZoom * 1.45;
+        const opacity = 1 - smoothstep(0, 0.92, zoomT);
+
+        headingWrapRef.current.style.visibility = opacity <= 0.01 ? "hidden" : "visible";
+        headingWrapRef.current.style.opacity = opacity.toFixed(3);
+        headingWrapRef.current.style.transform = `translate3d(0, 0, 0) scale(${scale.toFixed(3)})`;
+      }
+    }
+
+    // 3. Update 3D fly-through cards continuously (no preserve-3d flattening, no scale jumps)
+    const rawCardsProgress =
+      (progress - PHASE_CARDS_START) / (PHASE_CARDS_END - PHASE_CARDS_START);
+    const cardsProgress = Math.max(0, Math.min(1.08, rawCardsProgress));
+    const totalTravel = 8150;
+    const xFactor = isMobile ? 0.32 : 1;
+    const yFactor = isMobile ? 0.72 : 1;
+
+    testimonialsData.forEach((item, idx) => {
+      const cardEl = cardRefs.current[idx];
+      if (!cardEl) return;
+
+      if (progress < PHASE_CARDS_START - 0.02) {
+        cardEl.style.visibility = "hidden";
+        cardEl.style.opacity = "0";
+        return;
+      }
+
+      const currentZ = item.z + cardsProgress * totalTravel;
+
+      // Smooth fade-in in deep space (-3400 to -1200) and smooth fade-out before camera plane (+120 to +480)
+      let opacity = 0;
+      if (currentZ >= -3400 && currentZ <= 480) {
+        const fadeIn = smoothstep(-3400, -1200, currentZ);
+        const fadeOut = 1 - smoothstep(120, 480, currentZ);
+        opacity = fadeIn * fadeOut;
+      }
+
+      if (opacity <= 0.005) {
+        cardEl.style.visibility = "hidden";
+        cardEl.style.opacity = "0";
+        return;
+      }
+
+      const offsetX = item.x * xFactor;
+      const offsetY = item.y * yFactor;
+
+      cardEl.style.visibility = "visible";
+      cardEl.style.opacity = opacity.toFixed(3);
+      cardEl.style.transform = `translate3d(${offsetX.toFixed(2)}vw, ${offsetY.toFixed(2)}vh, ${currentZ.toFixed(1)}px)`;
+    });
+  }, [totalChars]);
+
+  useLenis(() => {
+    updateScene();
+  });
 
   useEffect(() => {
-    const handleScroll = () => {
-      if (!containerRef.current) return;
-
-      const rect = containerRef.current.getBoundingClientRect();
-      const viewportHeight = window.innerHeight;
-
-      const scrollDistance = rect.height - viewportHeight;
-
-      const scrolled = -rect.top;
-
-      let progress = scrolled / scrollDistance;
-
-      progress = Math.max(0, Math.min(1, progress));
-
-      setScrollProgress(progress);
+    updateScene();
+    window.addEventListener("scroll", updateScene, { passive: true });
+    window.addEventListener("resize", updateScene);
+    return () => {
+      window.removeEventListener("scroll", updateScene);
+      window.removeEventListener("resize", updateScene);
     };
+  }, [updateScene]);
 
-    handleScroll();
-
-    window.addEventListener("scroll", handleScroll, { passive: true });
-    return () => window.removeEventListener("scroll", handleScroll);
-  }, []);
-
-  const PHASE_TYPING_END = 0.2;
-
-  const PHASE_ZOOM_START = 0.2;
-  const PHASE_ZOOM_END = 0.3;
-
-  const PHASE_CARDS_START = 0.3;
-
-  const letters = HEADING_TEXT.split("");
-
-  const typingProgress = Math.min(1, scrollProgress / PHASE_TYPING_END);
-  const visibleLetterCount = Math.floor(typingProgress * letters.length);
-
-  let textTransform = "scale(1)";
-  let textOpacity = 1;
-  let textBlur = "0px";
-
-  if (scrollProgress > PHASE_ZOOM_START) {
-    const zoomRaw =
-      (scrollProgress - PHASE_ZOOM_START) / (PHASE_ZOOM_END - PHASE_ZOOM_START);
-    const zoom = Math.max(0, Math.min(1, zoomRaw));
-
-    textTransform = `scale(${1 + zoom * 2})`;
-    textOpacity = 1 - zoom;
-    textBlur = `${zoom * 10}px`;
-  }
-
-  const showCards = scrollProgress > PHASE_CARDS_START;
-  const cardsProgress = showCards
-    ? (scrollProgress - PHASE_CARDS_START) / (1 - PHASE_CARDS_START)
-    : 0;
+  // Precompute global character index so words stay grouped and never break mid-word
+  let globalCharCounter = 0;
 
   return (
-    <div ref={containerRef} className="relative h-[500vh] bg-[#4A148C] z-10 font-secondary">
-      <div className="sticky top-0 h-screen w-full overflow-hidden flex items-center justify-center perspective-container">
+    <div
+      ref={containerRef}
+      className="relative h-[480vh] bg-[#4A148C] z-10 font-secondary select-none"
+    >
+      <div
+        className="sticky top-0 h-screen w-full overflow-hidden flex items-center justify-center"
+        style={{ perspective: "900px" }}
+      >
+        {/* Ambient cosmic glow backdrop */}
         <div
-          className="absolute z-50 flex flex-col items-center justify-center pointer-events-none text-center px-4 w-full transition-transform duration-75 ease-linear font-secondary"
-          style={{
-            opacity: textOpacity,
-            transform: textTransform,
-            filter: `blur(${textBlur})`,
+          aria-hidden="true"
+          className="absolute inset-0 pointer-events-none z-0 bg-[radial-gradient(circle_at_50%_45%,rgba(139,92,246,0.28)_0%,rgba(74,20,140,0)_68%)]"
+        />
 
-            display: textOpacity <= 0.01 ? "none" : "flex",
-          }}
+        {/* Center Heading ("Apa Kata Mereka") */}
+        <div
+          ref={headingWrapRef}
+          className="absolute z-40 flex flex-col items-center justify-center pointer-events-none text-center px-6 w-full will-change-transform"
         >
-          <h2 className="text-5xl md:text-8xl lg:text-9xl font-extrabold text-white drop-shadow-lg tracking-tight font-secondary">
-            {letters.map((char, index) => {
-              const isTyped = index < visibleLetterCount;
+          <h2
+            aria-label="Apa Kata Mereka"
+            className="text-4xl sm:text-6xl md:text-7xl lg:text-8xl xl:text-[104px] font-primary font-bold text-white drop-shadow-[0_8px_32px_rgba(17,12,76,0.5)] tracking-tight leading-[1.1] flex flex-wrap items-center justify-center gap-x-3 sm:gap-x-5 md:gap-x-6 gap-y-2"
+          >
+            {HEADING_WORDS.map((word, wIdx) => {
+              const wordChars = word.split("").map((char) => {
+                const currentIdx = globalCharCounter++;
+                return { char, idx: currentIdx };
+              });
+              // Account for space between words
+              if (wIdx < HEADING_WORDS.length - 1) {
+                globalCharCounter++;
+              }
 
               return (
-                <span
-                  key={index}
-                  style={{
-                    opacity: isTyped ? 1 : 0.1,
-
-                    transform: isTyped
-                      ? "translateY(0) scale(1)"
-                      : "translateY(10px) scale(0.8)",
-                    filter: isTyped ? "blur(0px)" : "blur(4px)",
-
-                    transition: "all 0.2s cubic-bezier(0.25, 0.46, 0.45, 0.94)",
-                    display: "inline-block",
-                    whiteSpace: "pre",
-                  }}
-                >
-                  {char}
+                <span key={wIdx} className="inline-flex whitespace-nowrap">
+                  {wordChars.map(({ char, idx }) => (
+                    <span
+                      key={idx}
+                      ref={(el) => {
+                        letterRefs.current[idx] = el;
+                      }}
+                      className="inline-block will-change-transform"
+                      style={{
+                        opacity: 0.14,
+                        transform: "translate3d(0, 14px, 0) scale(0.88)",
+                      }}
+                    >
+                      {char}
+                    </span>
+                  ))}
                 </span>
               );
             })}
           </h2>
         </div>
 
+        {/* 3D Cards Stage (pure preserve-3d without parent opacity flattening) */}
         <div
-          className="relative w-full h-full flex items-center justify-center transform-style-3d font-secondary"
-          style={{
-            visibility: showCards ? "visible" : "hidden",
-            opacity: showCards ? 1 : 0,
-            transition: "opacity 0.5s ease-in",
-          }}
+          className="relative z-20 w-full h-full flex items-center justify-center pointer-events-none"
+          style={{ transformStyle: "preserve-3d" }}
         >
-          {testimonialsData.map((item) => {
-            const speed = 11000;
-            const currentZ = item.z + cardsProgress * speed;
-
-            let opacity = 1;
-            let scale = 1;
-
-            if (currentZ < -2000) {
-              opacity = 0.3 + (currentZ + 10000) / 20000;
-              scale = 0.8;
-            } else if (currentZ > 500) {
-              opacity = 1 - (currentZ - 500) / 300;
-              scale = 1.2;
-            }
-
-            if (currentZ < -15000 || opacity <= 0) return null;
-
-            return (
-              <div
-                key={item.id}
-                className="absolute p-6 rounded-2xl shadow-2xl border border-white/10 flex items-center gap-4 w-[320px] md:w-[450px] backdrop-blur-md font-secondary"
-                style={{
-                  backgroundColor: "rgba(30, 30, 46, 0.9)",
-
-                  transform: `translate3d(${item.x}vw, ${item.y}vh, ${currentZ}px) scale(${scale})`,
-                  opacity: Math.max(0, Math.min(1, opacity)),
-                  zIndex: Math.round(currentZ + 10000),
-                }}
-              >
-                <div className="relative w-12 h-12 md:w-14 md:h-14 flex-shrink-0">
+          {testimonialsData.map((item, idx) => (
+            <div
+              key={item.id}
+              ref={(el) => {
+                cardRefs.current[idx] = el;
+              }}
+              style={{
+                visibility: "hidden",
+                opacity: 0,
+                zIndex: testimonialsData.length - idx,
+                background:
+                  "linear-gradient(135deg, rgba(42, 16, 88, 0.94) 0%, rgba(22, 8, 52, 0.96) 100%)",
+              }}
+              className="absolute p-5 sm:p-6 rounded-2xl border border-white/15 shadow-[0_18px_44px_rgba(10,3,26,0.55),inset_0_1px_1px_rgba(255,255,255,0.18)] flex items-start sm:items-center gap-4 w-[290px] sm:w-[370px] md:w-[440px] will-change-transform"
+            >
+              <div className="relative w-12 h-12 sm:w-14 sm:h-14 flex-shrink-0 rounded-full p-0.5 bg-gradient-to-tr from-[#AD4BFF] to-[#6BECFF] shadow-[0_0_16px_rgba(173,75,255,0.45)]">
+                <div className="relative w-full h-full rounded-full overflow-hidden bg-[#1A083B]">
                   <Image
                     src={Avatar}
                     alt={item.name}
                     fill
-                    className="rounded-full object-cover border-2 border-[#FFD700]"
+                    sizes="56px"
+                    className="rounded-full object-cover"
                   />
                 </div>
-                <div className="text-white font-secondary">
-                  <h3 className="text-lg md:text-xl font-bold uppercase text-[#FFD700] tracking-wide">
+              </div>
+
+              <div className="flex-1 min-w-0 text-white font-secondary">
+                <div className="flex items-center justify-between gap-2 mb-0.5">
+                  <h3 className="text-base sm:text-lg font-primary font-bold uppercase text-white tracking-wide truncate">
                     {item.name}
                   </h3>
-                  <p className="text-xs text-gray-300 mb-1 font-medium">{item.role}</p>
-                  <p className="text-sm text-gray-100 leading-snug font-normal">
-                    {item.text}
-                  </p>
+                  <span className="text-[11px] sm:text-xs font-medium px-2.5 py-0.5 rounded-full bg-[#AD4BFF]/20 border border-[#AD4BFF]/40 text-[#E9D5FF] shrink-0">
+                    {item.role}
+                  </span>
                 </div>
+                <p className="text-xs sm:text-sm text-white/85 leading-relaxed font-normal mt-1">
+                  &ldquo;{item.text}&rdquo;
+                </p>
               </div>
-            );
-          })}
+            </div>
+          ))}
         </div>
 
-        <div className="absolute inset-0 pointer-events-none bg-[radial-gradient(circle_at_center,transparent_20%,#4A148C_100%)] z-40"></div>
+        {/* Soft edge vignette behind the heading but framing the 3D tunnel */}
+        <div
+          aria-hidden="true"
+          className="absolute inset-0 pointer-events-none bg-[radial-gradient(circle_at_center,transparent_38%,#4A148C_100%)] z-30"
+        />
       </div>
-
-      <style jsx>{`
-        .perspective-container {
-          perspective: 800px; /* Field of view kamera */
-        }
-        .transform-style-3d {
-          transform-style: preserve-3d;
-        }
-      `}</style>
     </div>
   );
 }
