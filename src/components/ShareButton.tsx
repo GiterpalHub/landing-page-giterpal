@@ -1,7 +1,6 @@
 'use client'
 
 import { Share2 } from "lucide-react";
-import { Button } from "./ui/button";
 
 const ShareButton = () => {
 
@@ -28,16 +27,15 @@ const ShareButton = () => {
         }
     }
     return (
-        <Button
+        <button
             type="button"
-            variant="glass"
             aria-label="Bagikan artikel"
             onClick={() => handleShare()}
-            className="lg:hidden rounded-full"
+            className="group inline-flex items-center gap-2 rounded-full border border-white/20 bg-white/10 px-4 py-2 text-sm font-secondary font-medium text-white backdrop-blur-xl transition-all duration-300 hover:bg-white hover:text-[#110C4C] hover:border-white shadow-sm"
         >
-            <Share2 />
+            <Share2 className="h-4 w-4 transition-transform duration-300 group-hover:scale-110" />
             <span>Bagikan</span>
-        </Button>
+        </button>
     );
 
 }

@@ -82,8 +82,8 @@ export default function CommentSection() {
   };
 
   return (
-    <div className="w-full max-w-3xl mx-auto mt-10">
-      <h3 className="text-primary text-xl font-bold text-white mb-4">Komentar ({comments.length})</h3>
+    <div className="w-full max-w-3xl mx-auto mt-6">
+      <h3 className="font-primary text-xl font-bold text-white mb-4">Komentar ({comments.length})</h3>
       
       <CommentInput onSubmit={handleAddComment} />
 

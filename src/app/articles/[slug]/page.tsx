@@ -1,18 +1,14 @@
-import CardArtikelMobile from "@/components/CardArtikelMobile";
 import CardArtikel from "@/components/CardArtikel";
 import Image from "next/image";
 import Link from "next/link";
-import { ChevronLeft, CalendarDays, UserRound } from "lucide-react";
+import { ChevronLeft, CalendarDays } from "lucide-react";
 import { articles, getArticleBySlug } from "@/lib/data/articles";
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
-import { Fragment } from "react";
 import Star2 from "@/assets/star2.svg";
 import Star5 from "@/assets/star5.svg";
 import Star3 from "@/assets/star5.svg";
 import BgStart from "@/assets/bgstart.png";
-import { Button } from "@/components/ui/button";
-import ShareButton from "@/components/ShareButton";
 import CommentSection from "@/components/sections/CommentSection";
 
 interface ArticlePageProps {
@@ -100,98 +96,90 @@ export default function ArticleDetailPage({ params }: ArticlePageProps) {
       </div>
 
       <div className="relative z-10 mx-auto max-w-7xl">
-        <div className="mb-6 flex items-center justify-between lg:absolute lg:-left-14 lg:top-0 lg:mb-0">
-          <Button asChild type="button" variant="glass" className="h-11 rounded-full px-3 lg:w-11 lg:justify-center lg:px-0">
-            <Link
-              href="/#article"
-              aria-label="Kembali"
-            >
-              <ChevronLeft
-                className="h-5 w-5"
-                strokeWidth={2.5}
-                aria-hidden="true"
-              />
-              <span className="pr-2 lg:hidden">Kembali</span>
-            </Link>
-          </Button>
-
-        <ShareButton />
+        <div className="mb-8 flex items-center">
+          <Link
+            href="/articles"
+            aria-label="Kembali ke Daftar Artikel"
+            className="group inline-flex items-center gap-2.5 rounded-full border border-white/20 bg-white/10 px-4 py-2 text-sm font-secondary font-medium text-white backdrop-blur-xl transition-all duration-300 hover:bg-white hover:text-[#110C4C] hover:border-white shadow-sm"
+          >
+            <ChevronLeft
+              className="h-4 w-4 transition-transform duration-300 group-hover:-translate-x-1"
+              strokeWidth={2.5}
+              aria-hidden="true"
+            />
+            <span>Kembali ke Artikel</span>
+          </Link>
         </div>
 
         <div className="grid grid-cols-1 gap-8 lg:grid-cols-3">
-          <div className="rounded-[32px] border border-white/20 bg-white/10 p-5 shadow-[0_0_61px_rgba(255,255,255,0.08)] backdrop-blur-xl md:p-8 lg:col-span-2 lg:p-10">
+          <div className="rounded-[28px] sm:rounded-[32px] border border-white/20 bg-white/10 p-6 sm:p-10 lg:p-12 shadow-[0_8px_32px_rgba(0,0,0,0.2)] backdrop-blur-xl lg:col-span-2">
             <article>
               <header className="mb-8">
-                <span className="mb-4 inline-block rounded-full bg-white px-4 py-1.5 text-xs font-bold text-[#110C4C]">
-                  {article.category}
-                </span>
-                <h1 className="break-words font-primary text-3xl font-bold leading-tight tracking-tight md:text-5xl lg:text-6xl">
+                <div className="mb-4 inline-flex items-center gap-2">
+                  <span className="font-secondary rounded-full bg-white px-3.5 py-1 text-xs font-bold uppercase tracking-wider text-[#110C4C] shadow-sm">
+                    {article.category}
+                  </span>
+                </div>
+
+                <h1 className="break-words font-secondary text-2xl font-bold leading-[1.25] tracking-tight text-white sm:text-3xl md:text-4xl lg:text-[42px] mb-6">
                   {article.title}
                 </h1>
-                <div className="mt-6 flex flex-wrap gap-5 font-secondary text-sm text-white/65">
-                  <span className="inline-flex items-center gap-2">
-                    <UserRound className="h-4 w-4" aria-hidden="true" />
-                    {article.author}
-                  </span>
-                  <span className="inline-flex items-center gap-2">
+
+                <div className="flex flex-wrap items-center gap-4 text-xs sm:text-sm font-secondary text-white/70 border-b border-white/15 pb-6">
+                  <div className="flex items-center gap-2">
+                    <div className="flex h-7 w-7 items-center justify-center rounded-full bg-white/20 border border-white/30 text-xs font-bold text-white shadow-sm">
+                      {article.author.charAt(0)}
+                    </div>
+                    <span className="font-medium text-white/90">{article.author}</span>
+                  </div>
+                  <span className="text-white/30">•</span>
+                  <div className="flex items-center gap-1.5 text-white/70">
                     <CalendarDays className="h-4 w-4" aria-hidden="true" />
-                    {article.date}
-                  </span>
+                    <span>{article.date}</span>
+                  </div>
+                  <span className="text-white/30">•</span>
+                  <span className="text-white/60">3 menit baca</span>
                 </div>
               </header>
 
-              <div className="mb-10 overflow-hidden rounded-[24px] border border-white/20 shadow-[0_0_40px_rgba(168,85,247,0.35)]">
+              <div className="relative mb-10 overflow-hidden rounded-[20px] md:rounded-[24px] border border-white/15 bg-black/20 shadow-2xl">
                 <Image
                   src={article.coverImage}
                   alt={`Sampul artikel: ${article.title}`}
-                  className="h-auto w-full object-cover"
+                  className="h-auto w-full max-h-[520px] object-cover"
                   priority
                   sizes="(max-width: 1024px) 100vw, 800px"
                 />
               </div>
 
-              <div className="space-y-6 font-secondary text-lg leading-loose text-white/80 md:text-xl">
-                {article.content.map((paragraph) => (
-                  <p key={paragraph}>{paragraph}</p>
+              <div className="space-y-6 font-secondary text-base sm:text-lg leading-relaxed text-white/85">
+                {article.content.map((paragraph, idx) => (
+                  <p key={idx}>{paragraph}</p>
                 ))}
               </div>
             </article>
 
-            <div className="mt-10 border-t border-white/15 pt-8">
-              <form action="">
-                <label className="mb-4 block font-primary text-xl font-bold">
-                  Tinggalkan Komentar
-                </label>
-                <CommentSection />
-              </form>
+            <div className="mt-14 border-t border-white/15 pt-8">
+              <CommentSection />
             </div>
           </div>
 
-          <aside className="lg:sticky lg:top-28">
-            <p className="mb-5 font-primary text-xl font-bold">Artikel lainnya</p>
+          <aside className="lg:sticky lg:top-28 self-start">
+            <p className="mb-5 font-primary text-xl font-bold text-white">Artikel lainnya</p>
 
             <div className="flex flex-col gap-6">
               {otherArticles.map((a) => (
-                <Fragment key={a.slug}>
-                  <CardArtikelMobile
-                    slug={a.slug}
-                    title={a.title}
-                    author={a.author}
-                    date={a.date}
-                    coverImage={a.coverImage}
-                  />
-                  <CardArtikel
-                    theme="glass"
-                    className="hidden lg:block"
-                    slug={a.slug}
-                    author={a.author}
-                    category={a.category}
-                    coverImage={a.coverImage}
-                    date={a.date}
-                    excerpt={a.excerpt}
-                    title={a.title}
-                  />
-                </Fragment>
+                <CardArtikel
+                  key={a.slug}
+                  theme="glass"
+                  slug={a.slug}
+                  author={a.author}
+                  category={a.category}
+                  coverImage={a.coverImage}
+                  date={a.date}
+                  excerpt={a.excerpt}
+                  title={a.title}
+                />
               ))}
             </div>
           </aside>

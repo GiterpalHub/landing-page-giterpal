@@ -49,7 +49,7 @@ export default function Footer() {
             <span className="font-primary text-3xl sm:text-4xl font-bold tracking-tight text-white leading-none">
               Giterpal.
             </span>
-            <span className="font-secondary text-xs sm:text-sm text-white/75 mt-1 mr-1">
+            <span className="font-secondary text-xs sm:text-sm text-white/75 -mt-1 sm:-mt-1.5 mr-1 leading-none">
               Hub
             </span>
           </Link>

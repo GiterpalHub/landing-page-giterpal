@@ -29,7 +29,7 @@ export default function CardArtikelMobile({ title, author, date, coverImage, slu
 
       <div className="pt-1 w-full flex flex-col min-w-0">
         <div className="flex justify-between items-start gap-2 mb-1">
-          <h3 className="font-primary text-[15px] font-bold text-white group-hover:text-[#6BECFF] transition leading-snug break-words line-clamp-3">
+          <h3 className="font-secondary text-[15px] font-bold text-white group-hover:text-[#AD4BFF] transition leading-snug break-words line-clamp-3">
             {title}
           </h3>
         </div>

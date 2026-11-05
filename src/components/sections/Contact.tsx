@@ -85,7 +85,19 @@ export default function Contact() {
   const lastScrollYRef = useRef<number | null>(null);
   const rafIdRef = useRef<number | null>(null);
 
-  // Trigger entrance choreography when section enters viewport
+  // Check if CTA hero block is meaningfully in viewport before triggering entrance choreography
+  const checkEntrance = useCallback(() => {
+    const el = heroBlockRef.current;
+    if (!el) return;
+    const rect = el.getBoundingClientRect();
+    const vh = window.innerHeight || 1;
+    // Trigger only when top of CTA block has scrolled well into view (e.g. at 62% of viewport height)
+    if (rect.top <= vh * 0.62 && rect.bottom >= vh * 0.15) {
+      setIsVisible(true);
+    }
+  }, []);
+
+  // Trigger entrance choreography ONLY when user has actually arrived at the section
   useEffect(() => {
     const el = heroBlockRef.current;
     if (!el) return;
@@ -97,12 +109,14 @@ export default function Contact() {
           observer.disconnect();
         }
       },
-      { threshold: 0.18, rootMargin: "0px 0px -50px 0px" }
+      { threshold: 0.25, rootMargin: "0px 0px -38% 0px" }
     );
 
     observer.observe(el);
+    checkEntrance();
+
     return () => observer.disconnect();
-  }, []);
+  }, [checkEntrance]);
 
   const renderTrackPosition = useCallback(() => {
     const trackEl = trackRef.current;
@@ -139,6 +153,8 @@ export default function Contact() {
 
   const handleScrollDelta = useCallback(
     (currentScrollY: number) => {
+      checkEntrance();
+
       if (lastScrollYRef.current === null) {
         lastScrollYRef.current = currentScrollY;
         return;
@@ -156,7 +172,7 @@ export default function Contact() {
       );
       startInertiaLoop();
     },
-    [startInertiaLoop]
+    [startInertiaLoop, checkEntrance]
   );
 
   useLenis(({ scroll }) => {
