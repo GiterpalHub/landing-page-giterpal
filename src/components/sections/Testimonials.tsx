@@ -4,6 +4,7 @@ import { useCallback, useEffect, useRef } from "react";
 import Image from "next/image";
 import { useLenis } from "lenis/react";
 import Avatar from "@/assets/Avatar.png";
+import Signature from "../ui/signature";
 
 const testimonialsData = [
   {
@@ -88,8 +89,6 @@ const testimonialsData = [
   },
 ];
 
-const HEADING_WORDS = ["Apa", "Kata", "Mereka"];
-
 function smoothstep(edge0: number, edge1: number, x: number) {
   const t = Math.max(0, Math.min(1, (x - edge0) / (edge1 - edge0)));
   return t * t * (3 - 2 * t);
@@ -98,10 +97,7 @@ function smoothstep(edge0: number, edge1: number, x: number) {
 export default function Testimonials() {
   const containerRef = useRef<HTMLDivElement>(null);
   const headingWrapRef = useRef<HTMLDivElement>(null);
-  const letterRefs = useRef<(HTMLSpanElement | null)[]>([]);
   const cardRefs = useRef<(HTMLDivElement | null)[]>([]);
-
-  const totalChars = HEADING_WORDS.join(" ").length;
 
   const updateScene = useCallback(() => {
     const container = containerRef.current;
@@ -117,33 +113,12 @@ export default function Testimonials() {
     const progress = Math.max(0, Math.min(1, scrolled / scrollDistance));
 
     // Phase timings aligned so all cards finish before Article's -mt-[105vh] covers the viewport at ~0.75
-    const PHASE_TYPING_END = 0.16;
     const PHASE_ZOOM_START = 0.16;
     const PHASE_ZOOM_END = 0.28;
     const PHASE_CARDS_START = 0.19;
     const PHASE_CARDS_END = 0.76;
 
-    // 1. Update individual letters of "Apa Kata Mereka"
-    const typingProgress = Math.max(0, Math.min(1, progress / PHASE_TYPING_END));
-    const exactCharPos = typingProgress * totalChars;
-
-    letterRefs.current.forEach((span, idx) => {
-      if (!span) return;
-      const charProgress = Math.max(
-        0,
-        Math.min(1, (exactCharPos - idx + 0.8) / 1.5)
-      );
-      const easedChar = charProgress * charProgress * (3 - 2 * charProgress);
-
-      const opacity = 0.1 + easedChar * 0.9;
-      const translateY = (1 - easedChar) * 10;
-      const scale = 0.85 + easedChar * 0.15;
-
-      span.style.opacity = opacity.toFixed(3);
-      span.style.transform = `translate3d(0, ${translateY.toFixed(1)}px, 0) scale(${scale.toFixed(3)})`;
-    });
-
-    // 2. Update heading zoom-through transition
+    // Heading zoom-through transition into 3D space
     if (headingWrapRef.current) {
       if (progress <= PHASE_ZOOM_START) {
         headingWrapRef.current.style.opacity = "1";
@@ -166,7 +141,7 @@ export default function Testimonials() {
       }
     }
 
-    // 3. Update 3D fly-through cards continuously (no preserve-3d flattening, no scale jumps)
+    // Update 3D fly-through cards continuously (pure preserve-3d)
     const rawCardsProgress =
       (progress - PHASE_CARDS_START) / (PHASE_CARDS_END - PHASE_CARDS_START);
     const cardsProgress = Math.max(0, Math.min(1.08, rawCardsProgress));
@@ -207,7 +182,7 @@ export default function Testimonials() {
       cardEl.style.opacity = opacity.toFixed(3);
       cardEl.style.transform = `translate3d(${offsetX.toFixed(2)}vw, ${offsetY.toFixed(2)}vh, ${currentZ.toFixed(1)}px)`;
     });
-  }, [totalChars]);
+  }, []);
 
   useLenis(() => {
     updateScene();
@@ -223,8 +198,6 @@ export default function Testimonials() {
     };
   }, [updateScene]);
 
-  let globalCharCounter = 0;
-
   return (
     <div
       ref={containerRef}
@@ -234,45 +207,20 @@ export default function Testimonials() {
         className="sticky top-0 h-screen w-full overflow-hidden flex items-center justify-center"
         style={{ perspective: "800px" }}
       >
-        {/* Center Heading ("Apa Kata Mereka") */}
+        {/* Center Heading ("Apa Kata Mereka" with Componentry Signature handwriting effect) */}
         <div
           ref={headingWrapRef}
-          className="absolute z-50 flex flex-col items-center justify-center pointer-events-none text-center px-6 w-full will-change-transform"
+          className="absolute z-50 flex flex-col items-center justify-center pointer-events-none text-center px-4 w-full will-change-transform"
         >
-          <h2
-            aria-label="Apa Kata Mereka"
-            className="text-5xl md:text-8xl lg:text-9xl font-extrabold text-white drop-shadow-lg tracking-tight font-secondary flex flex-wrap items-center justify-center gap-x-3 sm:gap-x-5 md:gap-x-6 gap-y-2"
-          >
-            {HEADING_WORDS.map((word, wIdx) => {
-              const wordChars = word.split("").map((char) => {
-                const currentIdx = globalCharCounter++;
-                return { char, idx: currentIdx };
-              });
-              if (wIdx < HEADING_WORDS.length - 1) {
-                globalCharCounter++;
-              }
-
-              return (
-                <span key={wIdx} className="inline-flex whitespace-nowrap">
-                  {wordChars.map(({ char, idx }) => (
-                    <span
-                      key={idx}
-                      ref={(el) => {
-                        letterRefs.current[idx] = el;
-                      }}
-                      className="inline-block will-change-transform"
-                      style={{
-                        opacity: 0.1,
-                        transform: "translate3d(0, 10px, 0) scale(0.85)",
-                      }}
-                    >
-                      {char}
-                    </span>
-                  ))}
-                </span>
-              );
-            })}
-          </h2>
+          <Signature
+            text="Apa Kata Mereka"
+            color="#FFFFFF"
+            fontSize={72}
+            duration={1.4}
+            inView={true}
+            once={true}
+            className="max-w-[92vw] sm:max-w-2xl md:max-w-3xl lg:max-w-4xl h-auto drop-shadow-[0_8px_32px_rgba(17,12,76,0.65)]"
+          />
         </div>
 
         {/* 3D Cards Stage (pure preserve-3d without parent opacity flattening) */}
