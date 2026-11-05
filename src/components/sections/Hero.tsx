@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState, useRef } from "react";
+import { useEffect, useState, useRef, useCallback } from "react";
 import { useLenis } from "lenis/react";
 import CardMission from "../CardMission";
 import GlowButton from "../GlowButton";
@@ -49,49 +49,19 @@ export default function Hero() {
   const star2Ref = useRef<HTMLDivElement>(null);
   const rocketRef = useRef<HTMLDivElement>(null);
 
-  // Sticky One-Way Spill State Refs
-  const visiTargetRef = useRef(0);
   const visiCurrentRef = useRef(0);
-  const isVisiCompleteRef = useRef(false);
-  const spillRafRef = useRef<number | null>(null);
-  const lastScrollYRef = useRef(0);
 
-  // Rocket Inertial Glide Refs (coasts smoothly after user stops scrolling)
-  const rocketTargetDeltaRef = useRef(0);
-  const rocketCurrentDeltaRef = useRef(0);
-  const rocketInitRef = useRef(false);
-  const rocketRafRef = useRef<number | null>(null);
+  const renderRocketTransform = useCallback((delta: number) => {
+    if (!rocketRef.current) return;
+    const vw = window.innerWidth || 1440;
+    const responsiveScale = Math.min(1.15, Math.max(0.48, vw / 1440));
+    const rocketX = delta * 0.48 * responsiveScale;
+    const rocketY = delta * -0.25 * responsiveScale;
+    rocketRef.current.style.transform = `translate3d(${rocketX}px, ${rocketY}px, 0)`;
+  }, []);
 
-  useEffect(() => {
-    const renderRocketTransform = (delta: number) => {
-      if (!rocketRef.current) return;
-      const vw = window.innerWidth || 1440;
-      const responsiveScale = Math.min(1.15, Math.max(0.48, vw / 1440));
-      const rocketX = delta * 0.48 * responsiveScale;
-      const rocketY = delta * -0.25 * responsiveScale;
-      rocketRef.current.style.transform = `translate3d(${rocketX}px, ${rocketY}px, 0)`;
-    };
-
-    const stepRocketInertia = () => {
-      const diff = rocketTargetDeltaRef.current - rocketCurrentDeltaRef.current;
-      if (Math.abs(diff) > 0.15) {
-        rocketCurrentDeltaRef.current += diff * 0.045;
-        renderRocketTransform(rocketCurrentDeltaRef.current);
-        rocketRafRef.current = window.requestAnimationFrame(stepRocketInertia);
-      } else {
-        rocketCurrentDeltaRef.current = rocketTargetDeltaRef.current;
-        renderRocketTransform(rocketCurrentDeltaRef.current);
-        rocketRafRef.current = null;
-      }
-    };
-
-    const startRocketRaf = () => {
-      if (rocketRafRef.current === null) {
-        rocketRafRef.current = window.requestAnimationFrame(stepRocketInertia);
-      }
-    };
-
-    const applyParallax = (currentScroll: number) => {
+  const applyParallax = useCallback(
+    (currentScroll: number) => {
       const vh = window.innerHeight || 800;
       const heroScroll = Math.min(currentScroll, vh * 1.6);
       const moonScroll = Math.min(currentScroll, vh * 1.85);
@@ -129,218 +99,55 @@ export default function Hero() {
         star2Ref.current.style.transform = `translate3d(0, ${visiOffset * -0.22}px, 0)`;
       }
 
-      // Rocket diagonal launch trajectory with inertial glide after scroll stops
+      // Rocket diagonal launch trajectory smoothly synchronized with scroll
       if (rocketRef.current) {
         const rocketDelta = currentScroll - vh * 2.05;
         const clampedDelta = Math.max(-vh * 0.9, Math.min(vh * 0.7, rocketDelta));
-        rocketTargetDeltaRef.current = clampedDelta;
-
-        if (!rocketInitRef.current) {
-          rocketInitRef.current = true;
-          rocketCurrentDeltaRef.current = clampedDelta;
-          renderRocketTransform(clampedDelta);
-        } else {
-          startRocketRaf();
-        }
-      }
-    };
-
-    const stepSpillAnimation = () => {
-      const diff = visiTargetRef.current - visiCurrentRef.current;
-      if (Math.abs(diff) > 0.002) {
-        visiCurrentRef.current += diff * 0.22;
-      } else {
-        visiCurrentRef.current = visiTargetRef.current;
+        renderRocketTransform(clampedDelta);
       }
 
-      if (visiTargetRef.current >= 1 && visiCurrentRef.current >= 0.985) {
-        visiCurrentRef.current = 1;
-        isVisiCompleteRef.current = true;
-        setVisiProgress(1);
-        spillRafRef.current = null;
-        return;
-      }
-
-      setVisiProgress(visiCurrentRef.current);
-
-      if (Math.abs(visiTargetRef.current - visiCurrentRef.current) > 0.002) {
-        spillRafRef.current = window.requestAnimationFrame(stepSpillAnimation);
-      } else {
-        spillRafRef.current = null;
-      }
-    };
-
-    const startSpillRaf = () => {
-      if (spillRafRef.current === null) {
-        spillRafRef.current = window.requestAnimationFrame(stepSpillAnimation);
-      }
-    };
-
-    const getPinY = () => {
-      return visiSectionRef.current?.offsetTop ?? window.innerHeight;
-    };
-
-    const snapToPinY = (pinY: number) => {
-      if (lenisRef.current) {
-        lenisRef.current.scrollTo(pinY, { immediate: true });
-      } else {
-        window.scrollTo(0, pinY);
-      }
-    };
-
-    const handleScroll = () => {
-      const currentScroll = lenisRef.current
-        ? lenisRef.current.scroll
-        : window.scrollY;
-      const pinY = getPinY();
-
-      // Only clamp if user dragged native scrollbar significantly past pinY (> pinY + 6px)
+      // Visi words spill progress based on scroll position
+      const pinY = visiSectionRef.current?.offsetTop ?? vh;
+      const visiRaw = (currentScroll - (pinY - vh * 0.75)) / (vh * 0.65);
+      const clampedVisi = Math.max(0, Math.min(1, visiRaw));
       if (
-        !isVisiCompleteRef.current &&
-        currentScroll > pinY + 6 &&
-        lastScrollYRef.current <= pinY + 80
+        Math.abs(clampedVisi - visiCurrentRef.current) > 0.012 ||
+        clampedVisi === 1 ||
+        clampedVisi === 0
       ) {
-        const overshoot = currentScroll - pinY;
-        visiTargetRef.current = Math.min(
-          1,
-          visiTargetRef.current + overshoot / 700
-        );
-        startSpillRaf();
-        snapToPinY(pinY);
-        lastScrollYRef.current = pinY;
-        applyParallax(pinY);
-        return;
+        visiCurrentRef.current = clampedVisi;
+        setVisiProgress(clampedVisi);
       }
+    },
+    [renderRocketTransform]
+  );
 
-      lastScrollYRef.current = currentScroll;
-      if (!lenisRef.current) {
-        applyParallax(currentScroll);
-      }
-    };
+  useLenis(({ scroll }) => {
+    applyParallax(scroll);
+  });
 
-    const handleWheel = (e: WheelEvent) => {
-      if (isVisiCompleteRef.current) return;
-
-      // Only intercept downward scroll; scrolling up is always free and goes straight back to Hero
-      if (e.deltaY <= 0) return;
-
-      const pinY = getPinY();
-      const currentScroll = lenisRef.current
-        ? lenisRef.current.scroll
-        : window.scrollY;
-      const targetScroll = lenisRef.current?.targetScroll ?? currentScroll;
-      const nextTarget = targetScroll + e.deltaY;
-
-      // If this downward scroll reaches or is at Section 2 (while coming from Hero/Section 2)
-      if (nextTarget >= pinY && currentScroll <= pinY + 120) {
-        e.preventDefault();
-        e.stopPropagation();
-
-        if (lenisRef.current) {
-          // Only set targetScroll to pinY once so Lenis glides smoothly without resetting or snapping
-          if (Math.abs(lenisRef.current.targetScroll - pinY) > 0.5) {
-            lenisRef.current.scrollTo(pinY);
-          }
-        } else {
-          window.scrollTo(0, pinY);
-        }
-
-        // Once Section 2 is arriving/pinned in viewport, spill the words
-        if (currentScroll >= pinY - 260) {
-          const step = Math.min(
-            0.16,
-            Math.max(0.035, Math.abs(e.deltaY) / 650)
-          );
-          visiTargetRef.current = Math.min(1, visiTargetRef.current + step);
-          startSpillRaf();
-        }
-      }
-    };
-
-    let touchStartY = 0;
-    const handleTouchStart = (e: TouchEvent) => {
-      if (e.touches.length > 0) {
-        touchStartY = e.touches[0].clientY;
-      }
-    };
-
-    const handleTouchMove = (e: TouchEvent) => {
-      if (isVisiCompleteRef.current || e.touches.length === 0) return;
-
-      const currentTouchY = e.touches[0].clientY;
-      const deltaY = touchStartY - currentTouchY;
-      touchStartY = currentTouchY;
-
-      // Only intercept downward scroll (finger swiping up)
-      if (deltaY <= 0) return;
-
-      const pinY = getPinY();
-      const currentScroll = lenisRef.current
-        ? lenisRef.current.scroll
-        : window.scrollY;
-
-      if (currentScroll >= pinY - 45 && currentScroll <= pinY + 120) {
-        if (e.cancelable) e.preventDefault();
-        e.stopPropagation();
-
-        if (
-          lenisRef.current &&
-          Math.abs(lenisRef.current.targetScroll - pinY) > 1
-        ) {
-          lenisRef.current.scrollTo(pinY);
-        }
-
-        const step = Math.min(0.16, Math.max(0.02, deltaY / 450));
-        visiTargetRef.current = Math.min(1, visiTargetRef.current + step);
-        startSpillRaf();
-      }
-    };
-
-    const onLenisScroll = (e: { scroll: number }) => {
-      lastScrollYRef.current = e.scroll;
-      applyParallax(e.scroll);
-    };
-
-    const activeLenis = lenisRef.current;
-    if (activeLenis) {
-      activeLenis.on("scroll", onLenisScroll);
-    }
-
+  useEffect(() => {
     applyParallax(window.scrollY);
-    window.addEventListener("scroll", handleScroll, { passive: true });
-    window.addEventListener("wheel", handleWheel, {
-      passive: false,
-      capture: true,
-    });
-    window.addEventListener("touchstart", handleTouchStart, {
-      passive: true,
-      capture: true,
-    });
-    window.addEventListener("touchmove", handleTouchMove, {
-      passive: false,
-      capture: true,
-    });
+
+    // Fallback native scroll listener only if Lenis is not active
+    const onScroll = () => {
+      if (!lenisRef.current) {
+        applyParallax(window.scrollY);
+      }
+    };
+
+    const onResize = () => {
+      applyParallax(window.scrollY);
+    };
+
+    window.addEventListener("scroll", onScroll, { passive: true });
+    window.addEventListener("resize", onResize);
 
     return () => {
-      if (activeLenis) {
-        activeLenis.off("scroll", onLenisScroll);
-      }
-      window.removeEventListener("scroll", handleScroll);
-      window.removeEventListener("wheel", handleWheel, { capture: true });
-      window.removeEventListener("touchstart", handleTouchStart, {
-        capture: true,
-      });
-      window.removeEventListener("touchmove", handleTouchMove, {
-        capture: true,
-      });
-      if (spillRafRef.current !== null) {
-        window.cancelAnimationFrame(spillRafRef.current);
-      }
-      if (rocketRafRef.current !== null) {
-        window.cancelAnimationFrame(rocketRafRef.current);
-      }
+      window.removeEventListener("scroll", onScroll);
+      window.removeEventListener("resize", onResize);
     };
-  }, [lenis]);
+  }, [applyParallax]);
 
   const scrollOneScreen = () => {
     const pinY = visiSectionRef.current?.offsetTop ?? window.innerHeight;
