@@ -249,8 +249,7 @@ export default function Testimonials() {
             fourthColor="168, 85, 247"
             fifthColor="28, 7, 64"
             pointerColor="173, 75, 255"
-            size="68%"
-            blendingValue="hard-light"
+            size="75vmax"
             interactive={true}
             containerClassName="h-full w-full"
           />

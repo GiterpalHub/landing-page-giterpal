@@ -1,8 +1,20 @@
 "use client";
 
-import React, { useEffect, useId, useRef, useState } from "react";
+import React, { useEffect, useRef } from "react";
 import { cn } from "@/lib/utils";
 
+/**
+ * Lightweight aurora background.
+ *
+ * Performance notes (vs. the original SVG "goo" version):
+ * - No SVG filter / CSS blur: each blob is a radial-gradient that already fades to
+ *   transparent, so edges are soft without any per-frame filter work.
+ * - No mix-blend-mode: avoids forcing the browser to re-blend overlapping full-screen layers.
+ * - Blobs only animate `transform` (GPU compositor only, no repaint).
+ * - CSS animations are paused and the pointer rAF loop stops while the section is off-screen.
+ * - Pointer loop sleeps once the blob reaches its target; disabled on touch devices.
+ * - Respects prefers-reduced-motion.
+ */
 export interface BackgroundGradientAnimationProps {
   gradientBackgroundStart?: string;
   gradientBackgroundEnd?: string;
@@ -13,6 +25,7 @@ export interface BackgroundGradientAnimationProps {
   fifthColor?: string;
   pointerColor?: string;
   size?: string;
+  /** Kept for API compatibility; ignored in the lightweight version. */
   blendingValue?: string;
   children?: React.ReactNode;
   className?: string;
@@ -29,233 +42,187 @@ export const BackgroundGradientAnimation = ({
   fourthColor = "168, 85, 247",
   fifthColor = "30, 10, 68",
   pointerColor = "173, 75, 255",
-  size = "68%",
-  blendingValue = "hard-light",
+  size = "75vmax",
   children,
   className,
   interactive = true,
   containerClassName,
 }: BackgroundGradientAnimationProps) => {
   const containerRef = useRef<HTMLDivElement>(null);
-  const interactiveRef = useRef<HTMLDivElement>(null);
-  const filterId = `blurMe-${useId().replace(/:/g, "")}`;
+  const pointerRef = useRef<HTMLDivElement>(null);
 
-  // Use refs to store animation values instead of state
-  const curXRef = useRef(0);
-  const curYRef = useRef(0);
-  const tgXRef = useRef(0);
-  const tgYRef = useRef(0);
-  const animationFrameRef = useRef<number | null>(null);
-
-  const [isSafari, setIsSafari] = useState(false);
-
-  // Set up Safari detection
   useEffect(() => {
-    setIsSafari(/^((?!chrome|android).)*safari/i.test(navigator.userAgent));
-  }, []);
+    const container = containerRef.current;
+    if (!container) return;
 
-  // Set up animation loop and window-level mouse tracking so it works behind foreground layers
-  useEffect(() => {
-    if (!interactive) return;
+    const reduceMotion = window.matchMedia(
+      "(prefers-reduced-motion: reduce)"
+    ).matches;
+    const canHover = window.matchMedia("(hover: hover) and (pointer: fine)")
+      .matches;
+    const pointerEnabled = interactive && canHover && !reduceMotion;
 
-    const handleWindowMouseMove = (event: MouseEvent) => {
-      const container = containerRef.current;
-      if (!container) return;
-      const rect = container.getBoundingClientRect();
-      // Only update target when section is near or in viewport
-      if (rect.bottom < 0 || rect.top > window.innerHeight) return;
-      tgXRef.current = event.clientX - rect.left - rect.width / 2;
-      tgYRef.current = event.clientY - rect.top - rect.height / 2;
+    let inView = false;
+    let rafId: number | null = null;
+    let curX = 0;
+    let curY = 0;
+    let tgX = 0;
+    let tgY = 0;
+
+    const setPlayState = (running: boolean) => {
+      container.style.setProperty(
+        "--aurora-play-state",
+        running && !reduceMotion ? "running" : "paused"
+      );
     };
 
-    function animateMovement() {
-      if (interactiveRef.current) {
-        curXRef.current += (tgXRef.current - curXRef.current) / 20;
-        curYRef.current += (tgYRef.current - curYRef.current) / 20;
-
-        interactiveRef.current.style.transform = `translate3d(${Math.round(
-          curXRef.current
-        )}px, ${Math.round(curYRef.current)}px, 0)`;
+    const tick = () => {
+      curX += (tgX - curX) * 0.06;
+      curY += (tgY - curY) * 0.06;
+      if (pointerRef.current) {
+        pointerRef.current.style.transform = `translate3d(${curX.toFixed(
+          1
+        )}px, ${curY.toFixed(1)}px, 0)`;
       }
+      // Sleep once the blob has settled; wake again on the next mousemove
+      if (inView && Math.abs(tgX - curX) + Math.abs(tgY - curY) > 0.5) {
+        rafId = requestAnimationFrame(tick);
+      } else {
+        rafId = null;
+      }
+    };
 
-      animationFrameRef.current = requestAnimationFrame(animateMovement);
+    const onMouseMove = (event: MouseEvent) => {
+      if (!inView) return;
+      const rect = container.getBoundingClientRect();
+      tgX = event.clientX - rect.left - rect.width / 2;
+      tgY = event.clientY - rect.top - rect.height / 2;
+      if (rafId === null) rafId = requestAnimationFrame(tick);
+    };
+
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        inView = entry.isIntersecting;
+        setPlayState(inView);
+        if (!inView && rafId !== null) {
+          cancelAnimationFrame(rafId);
+          rafId = null;
+        }
+      },
+      { threshold: 0 }
+    );
+
+    setPlayState(false);
+    observer.observe(container);
+    if (pointerEnabled) {
+      window.addEventListener("mousemove", onMouseMove, { passive: true });
     }
 
-    window.addEventListener("mousemove", handleWindowMouseMove, {
-      passive: true,
-    });
-    animationFrameRef.current = requestAnimationFrame(animateMovement);
-
     return () => {
-      window.removeEventListener("mousemove", handleWindowMouseMove);
-      if (animationFrameRef.current !== null) {
-        cancelAnimationFrame(animationFrameRef.current);
-      }
+      observer.disconnect();
+      window.removeEventListener("mousemove", onMouseMove);
+      if (rafId !== null) cancelAnimationFrame(rafId);
     };
   }, [interactive]);
 
-  const cssVariables = {
-    "--gradient-background-start": gradientBackgroundStart,
-    "--gradient-background-end": gradientBackgroundEnd,
-    "--first-color": firstColor,
-    "--second-color": secondColor,
-    "--third-color": thirdColor,
-    "--fourth-color": fourthColor,
-    "--fifth-color": fifthColor,
-    "--pointer-color": pointerColor,
-    "--size": size,
-    "--blending-value": blendingValue,
-  } as React.CSSProperties;
+  // `closest-side` guarantees the gradient reaches full transparency exactly at the
+  // element's edge, so blobs never show a hard clipped border at any aspect ratio.
+  const blob = (color: string, alpha: number) =>
+    `radial-gradient(circle closest-side, rgba(${color}, ${alpha}) 0%, rgba(${color}, ${(
+      alpha * 0.5
+    ).toFixed(2)}) 40%, rgba(${color}, ${(alpha * 0.15).toFixed(
+      2
+    )}) 70%, rgba(${color}, 0) 100%)`;
+
+  // Square blobs sized in vmax so they stay perfectly round on 16:9, ultrawide and portrait
+  const blobBase =
+    "absolute w-[var(--size)] h-[var(--size)] top-[calc(50%-var(--size)/2)] left-[calc(50%-var(--size)/2)] will-change-transform";
 
   return (
     <div
       ref={containerRef}
-      style={cssVariables}
+      style={
+        {
+          "--size": size,
+          "--aurora-play-state": "paused",
+          background: `linear-gradient(40deg, ${gradientBackgroundStart}, ${gradientBackgroundEnd})`,
+        } as React.CSSProperties
+      }
       className={cn(
-        "h-full w-full relative overflow-hidden top-0 left-0 bg-[linear-gradient(40deg,var(--gradient-background-start),var(--gradient-background-end))]",
+        "h-full w-full relative overflow-hidden top-0 left-0",
         containerClassName
       )}
     >
       <style>{`
-        @keyframes bg-grad-moveHorizontal {
-          0% {
-            transform: translateX(-50%) translateY(-10%);
-          }
-          50% {
-            transform: translateX(50%) translateY(10%);
-          }
-          100% {
-            transform: translateX(-50%) translateY(-10%);
-          }
+        @keyframes aurora-vertical {
+          0%, 100% { transform: translate3d(0, -30%, 0); }
+          50% { transform: translate3d(0, 30%, 0); }
         }
-        @keyframes bg-grad-moveInCircle {
-          0% {
-            transform: rotate(0deg);
-          }
-          50% {
-            transform: rotate(180deg);
-          }
-          100% {
-            transform: rotate(360deg);
-          }
+        @keyframes aurora-horizontal {
+          0%, 100% { transform: translate3d(-35%, -8%, 0); }
+          50% { transform: translate3d(35%, 8%, 0); }
         }
-        @keyframes bg-grad-moveVertical {
-          0% {
-            transform: translateY(-50%);
-          }
-          50% {
-            transform: translateY(50%);
-          }
-          100% {
-            transform: translateY(-50%);
-          }
+        @keyframes aurora-circle {
+          from { transform: rotate(0deg); }
+          to { transform: rotate(360deg); }
         }
-        .animate-first {
-          animation: bg-grad-moveVertical 26s ease infinite;
-        }
-        .animate-second {
-          animation: bg-grad-moveInCircle 18s reverse infinite;
-        }
-        .animate-third {
-          animation: bg-grad-moveInCircle 34s linear infinite;
-        }
-        .animate-fourth {
-          animation: bg-grad-moveHorizontal 32s ease infinite;
-        }
-        .animate-fifth {
-          animation: bg-grad-moveInCircle 22s ease infinite;
+        .aurora-blob {
+          animation-play-state: var(--aurora-play-state, paused) !important;
         }
       `}</style>
 
-      <svg className="hidden" aria-hidden="true">
-        <defs>
-          <filter id={filterId}>
-            <feGaussianBlur
-              in="SourceGraphic"
-              stdDeviation="10"
-              result="blur"
-            />
-            <feColorMatrix
-              in="blur"
-              mode="matrix"
-              values="1 0 0 0 0  0 1 0 0 0  0 0 1 0 0  0 0 0 18 -8"
-              result="goo"
-            />
-            <feBlend in="SourceGraphic" in2="goo" />
-          </filter>
-        </defs>
-      </svg>
-
-      {children && <div className={cn("relative z-10", className)}>{children}</div>}
-
-      <div
-        style={
-          !isSafari
-            ? { filter: `url(#${filterId}) blur(40px)` }
-            : undefined
-        }
-        className={cn(
-          "gradients-container h-full w-full blur-lg",
-          isSafari && "blur-2xl"
-        )}
-      >
+      <div aria-hidden="true" className="absolute inset-0 pointer-events-none">
         <div
-          className={cn(
-            "absolute [background:radial-gradient(circle_at_center,_rgba(var(--first-color),_0.82)_0,_rgba(var(--first-color),_0)_50%)_no-repeat]",
-            "[mix-blend-mode:var(--blending-value)] w-[var(--size)] h-[var(--size)] top-[calc(50%-var(--size)/2)] left-[calc(50%-var(--size)/2)]",
-            "[transform-origin:center_center]",
-            "animate-first",
-            "opacity-95"
-          )}
+          className={cn(blobBase, "aurora-blob")}
+          style={{
+            background: blob(firstColor, 0.7),
+            animation: "aurora-vertical 26s ease-in-out infinite",
+          }}
         />
         <div
-          className={cn(
-            "absolute [background:radial-gradient(circle_at_center,_rgba(var(--second-color),_0.78)_0,_rgba(var(--second-color),_0)_50%)_no-repeat]",
-            "[mix-blend-mode:var(--blending-value)] w-[var(--size)] h-[var(--size)] top-[calc(50%-var(--size)/2)] left-[calc(50%-var(--size)/2)]",
-            "[transform-origin:calc(50%-360px)]",
-            "animate-second",
-            "opacity-90"
-          )}
+          className={cn(blobBase, "aurora-blob")}
+          style={{
+            background: blob(secondColor, 0.55),
+            transformOrigin: "calc(50% - 320px) 50%",
+            animation: "aurora-circle 22s linear infinite reverse",
+          }}
         />
         <div
-          className={cn(
-            "absolute [background:radial-gradient(circle_at_center,_rgba(var(--third-color),_0.78)_0,_rgba(var(--third-color),_0)_50%)_no-repeat]",
-            "[mix-blend-mode:var(--blending-value)] w-[var(--size)] h-[var(--size)] top-[calc(50%-var(--size)/2)] left-[calc(50%-var(--size)/2)]",
-            "[transform-origin:calc(50%+360px)]",
-            "animate-third",
-            "opacity-90"
-          )}
+          className={cn(blobBase, "aurora-blob")}
+          style={{
+            background: blob(thirdColor, 0.6),
+            transformOrigin: "calc(50% + 320px) 50%",
+            animation: "aurora-circle 34s linear infinite",
+          }}
         />
         <div
-          className={cn(
-            "absolute [background:radial-gradient(circle_at_center,_rgba(var(--fourth-color),_0.75)_0,_rgba(var(--fourth-color),_0)_50%)_no-repeat]",
-            "[mix-blend-mode:var(--blending-value)] w-[var(--size)] h-[var(--size)] top-[calc(50%-var(--size)/2)] left-[calc(50%-var(--size)/2)]",
-            "[transform-origin:calc(50%-180px)]",
-            "animate-fourth",
-            "opacity-75"
-          )}
+          className={cn(blobBase, "aurora-blob")}
+          style={{
+            background: blob(fourthColor, 0.5),
+            animation: "aurora-horizontal 30s ease-in-out infinite",
+          }}
         />
         <div
-          className={cn(
-            "absolute [background:radial-gradient(circle_at_center,_rgba(var(--fifth-color),_0.85)_0,_rgba(var(--fifth-color),_0)_50%)_no-repeat]",
-            "[mix-blend-mode:var(--blending-value)] w-[var(--size)] h-[var(--size)] top-[calc(50%-var(--size)/2)] left-[calc(50%-var(--size)/2)]",
-            "[transform-origin:calc(50%-560px)_calc(50%+560px)]",
-            "animate-fifth",
-            "opacity-90"
-          )}
+          className={cn(blobBase, "aurora-blob")}
+          style={{
+            background: blob(fifthColor, 0.75),
+            transformOrigin: "calc(50% - 480px) calc(50% + 480px)",
+            animation: "aurora-circle 28s ease-in-out infinite",
+          }}
         />
 
         {interactive && (
           <div
-            ref={interactiveRef}
-            className={cn(
-              "absolute [background:radial-gradient(circle_at_center,_rgba(var(--pointer-color),_0.75)_0,_rgba(var(--pointer-color),_0)_50%)_no-repeat]",
-              "[mix-blend-mode:var(--blending-value)] w-full h-full top-0 left-0",
-              "opacity-75 will-change-transform"
-            )}
+            ref={pointerRef}
+            className="absolute w-[60vmax] h-[60vmax] top-[calc(50%-30vmax)] left-[calc(50%-30vmax)] will-change-transform"
+            style={{ background: blob(pointerColor, 0.45) }}
           />
         )}
       </div>
+
+      {children && (
+        <div className={cn("relative z-10", className)}>{children}</div>
+      )}
     </div>
   );
 };
