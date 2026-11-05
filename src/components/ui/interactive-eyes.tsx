@@ -16,7 +16,7 @@ export default function InteractiveEyes({
   className = "flex items-center gap-1.5 sm:gap-2 md:gap-2.5 shrink-0",
   eyeClassName = "w-11 sm:w-16 md:w-20 lg:w-24 xl:w-[104px] h-auto shrink-0 select-none cursor-pointer",
   isVisible = true,
-  spawnDelayMs = 580,
+  spawnDelayMs = 870,
 }: InteractiveEyesProps) {
   const leftEyeRef = useRef<SVGSVGElement>(null);
   const rightEyeRef = useRef<SVGSVGElement>(null);
@@ -254,7 +254,7 @@ export default function InteractiveEyes({
           opacity: isVisible ? 1 : 0,
           transform: isVisible ? "scale(1)" : "scale(0)",
           animation: isVisible
-            ? `contact-pop-in 560ms cubic-bezier(0.22, 1, 0.36, 1) ${spawnDelayMs}ms both`
+            ? `contact-pop-in 840ms cubic-bezier(0.22, 1, 0.36, 1) ${spawnDelayMs}ms both`
             : "none",
         }}
       >
@@ -310,7 +310,7 @@ export default function InteractiveEyes({
           opacity: isVisible ? 1 : 0,
           transform: isVisible ? "scale(1)" : "scale(0)",
           animation: isVisible
-            ? `contact-pop-in 560ms cubic-bezier(0.22, 1, 0.36, 1) ${spawnDelayMs + 95}ms both`
+            ? `contact-pop-in 840ms cubic-bezier(0.22, 1, 0.36, 1) ${spawnDelayMs + 140}ms both`
             : "none",
         }}
       >

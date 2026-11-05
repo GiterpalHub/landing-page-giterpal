@@ -4,6 +4,7 @@ import { useCallback, useEffect, useRef } from "react";
 import Image from "next/image";
 import { useLenis } from "lenis/react";
 import Avatar from "@/assets/Avatar.png";
+import { BackgroundGradientAnimation } from "../ui/background-gradient-animation";
 import Signature, { type SignatureHandle } from "../ui/signature";
 
 const testimonialsData = [
@@ -115,9 +116,9 @@ export default function Testimonials() {
 
     // Phase timings aligned so all cards finish before Article's -mt-[105vh] covers the viewport at ~0.75
     const PHASE_TYPING_END = 0.21;
-    const PHASE_ZOOM_START = 0.25;
-    const PHASE_ZOOM_END = 0.35;
-    const PHASE_CARDS_START = 0.27;
+    const PHASE_ZOOM_START = 0.23;
+    const PHASE_ZOOM_END = 0.34;
+    const PHASE_CARDS_START = 0.25;
     const PHASE_CARDS_END = 0.76;
 
     // Scroll-driven handwriting progress:
@@ -140,6 +141,7 @@ export default function Testimonials() {
       if (progress <= PHASE_ZOOM_START) {
         headingWrapRef.current.style.opacity = "1";
         headingWrapRef.current.style.transform = "translate3d(0, 0, 0) scale(1)";
+        headingWrapRef.current.style.filter = "blur(0px)";
         headingWrapRef.current.style.visibility = "visible";
       } else if (progress >= PHASE_ZOOM_END) {
         headingWrapRef.current.style.opacity = "0";
@@ -148,12 +150,14 @@ export default function Testimonials() {
         const zoomT =
           (progress - PHASE_ZOOM_START) / (PHASE_ZOOM_END - PHASE_ZOOM_START);
         const easedZoom = zoomT * zoomT;
-        const scale = 1 + easedZoom * 1.6;
-        const opacity = 1 - smoothstep(0, 0.92, zoomT);
+        const scale = 1 + easedZoom * 1.55;
+        const opacity = 1 - smoothstep(0, 0.95, zoomT);
+        const blurPx = smoothstep(0.15, 0.95, zoomT) * 8;
 
         headingWrapRef.current.style.visibility =
           opacity <= 0.01 ? "hidden" : "visible";
         headingWrapRef.current.style.opacity = opacity.toFixed(3);
+        headingWrapRef.current.style.filter = `blur(${blurPx.toFixed(1)}px)`;
         headingWrapRef.current.style.transform = `translate3d(0, 0, 0) scale(${scale.toFixed(3)})`;
       }
     }
@@ -162,7 +166,7 @@ export default function Testimonials() {
     const rawCardsProgress =
       (progress - PHASE_CARDS_START) / (PHASE_CARDS_END - PHASE_CARDS_START);
     const cardsProgress = Math.max(0, Math.min(1.08, rawCardsProgress));
-    const totalTravel = 8150;
+    const totalTravel = 8350;
     const xFactor = isMobile ? 0.32 : 1;
     const yFactor = isMobile ? 0.72 : 1;
 
@@ -170,20 +174,27 @@ export default function Testimonials() {
       const cardEl = cardRefs.current[idx];
       if (!cardEl) return;
 
-      if (progress < PHASE_CARDS_START - 0.02) {
+      if (progress <= PHASE_CARDS_START) {
         cardEl.style.visibility = "hidden";
         cardEl.style.opacity = "0";
         return;
       }
 
-      const currentZ = item.z + cardsProgress * totalTravel;
+      // Smooth global entrance fade right after "Apa Kata Mereka" zooms out,
+      // preventing the first cards (already inside z > -3400) from popping in abruptly
+      const entranceStart = PHASE_CARDS_START + idx * 0.008;
+      const entranceEnd = entranceStart + 0.085;
+      const entranceFade = smoothstep(entranceStart, entranceEnd, progress);
 
-      // Smooth fade-in in deep space (-3400 to -1200) and smooth fade-out before camera plane (+120 to +480)
+      const initialZ = item.z - 250;
+      const currentZ = initialZ + cardsProgress * totalTravel;
+
+      // Smooth fade-in in deep space (-3400 to -1200) and smooth fade-out before camera plane (+100 to +460)
       let opacity = 0;
-      if (currentZ >= -3400 && currentZ <= 480) {
+      if (currentZ >= -3400 && currentZ <= 460) {
         const fadeIn = smoothstep(-3400, -1200, currentZ);
-        const fadeOut = 1 - smoothstep(120, 480, currentZ);
-        opacity = fadeIn * fadeOut;
+        const fadeOut = 1 - smoothstep(100, 460, currentZ);
+        opacity = fadeIn * fadeOut * entranceFade;
       }
 
       if (opacity <= 0.005) {
@@ -224,6 +235,29 @@ export default function Testimonials() {
         className="sticky top-0 h-screen w-full overflow-hidden flex items-center justify-center"
         style={{ perspective: "800px" }}
       >
+        {/* Animated Aurora / Gooey Gradient Blobs Background Layer */}
+        <div
+          aria-hidden="true"
+          className="absolute inset-0 z-10 pointer-events-none"
+        >
+          <BackgroundGradientAnimation
+            gradientBackgroundStart="#4A148C"
+            gradientBackgroundEnd="#4A148C"
+            firstColor="139, 92, 246"
+            secondColor="192, 38, 211"
+            thirdColor="99, 102, 241"
+            fourthColor="168, 85, 247"
+            fifthColor="28, 7, 64"
+            pointerColor="173, 75, 255"
+            size="68%"
+            blendingValue="hard-light"
+            interactive={true}
+            containerClassName="h-full w-full"
+          />
+          {/* Top & Bottom Edge Feather so transition from Project (#4A148C) and into Article is 100% seamless */}
+          <div className="absolute inset-0 bg-[linear-gradient(180deg,#4A148C_0%,transparent_22%,transparent_78%,#4A148C_100%)]" />
+        </div>
+
         {/* Center Heading ("Apa Kata Mereka" with Componentry Signature handwriting effect) */}
         <div
           ref={headingWrapRef}
@@ -241,7 +275,7 @@ export default function Testimonials() {
 
         {/* 3D Cards Stage (pure preserve-3d without parent opacity flattening) */}
         <div
-          className="relative z-20 w-full h-full flex items-center justify-center pointer-events-none"
+          className="relative z-30 w-full h-full flex items-center justify-center pointer-events-none"
           style={{ transformStyle: "preserve-3d" }}
         >
           {testimonialsData.map((item, idx) => (
@@ -280,10 +314,10 @@ export default function Testimonials() {
           ))}
         </div>
 
-        {/* Original radial vignette matching #4A148C seamlessly */}
+        {/* Radial vignette matching #4A148C seamlessly at outer edges */}
         <div
           aria-hidden="true"
-          className="absolute inset-0 pointer-events-none bg-[radial-gradient(circle_at_center,transparent_20%,#4A148C_100%)] z-40"
+          className="absolute inset-0 pointer-events-none bg-[radial-gradient(circle_at_center,transparent_28%,#4A148C_96%)] z-40"
         />
       </div>
     </div>

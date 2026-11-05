@@ -31,7 +31,7 @@ export default function Footer() {
   };
 
   return (
-    <footer className="relative z-20 w-full bg-[#231B42] text-white overflow-hidden">
+    <footer className="relative z-20 w-full bg-[#13072C]/55 backdrop-blur-2xl text-white overflow-hidden">
       {/* Subtle bottom-center purple/magenta glow matching design */}
       <div
         aria-hidden="true"

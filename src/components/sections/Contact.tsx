@@ -5,6 +5,7 @@ import Image from "next/image";
 import { useLenis } from "lenis/react";
 import Footer from "../layout/Footer";
 import DotBorderButton from "../ui/dot-border-button";
+import { GradientBars } from "../ui/gradient-bars-background";
 import InteractiveEyes from "../ui/interactive-eyes";
 import Star2 from "@/assets/star2.svg";
 import Star3 from "@/assets/star3.svg";
@@ -34,7 +35,7 @@ const AnimatedText = ({
   text,
   isVisible,
   baseDelayMs = 0,
-  staggerMs = 26,
+  staggerMs = 39,
   className = "",
 }: {
   text: string;
@@ -59,7 +60,7 @@ const AnimatedText = ({
             : "translateY(38%) scale(0.92)",
           filter: isVisible ? "blur(0px)" : "blur(8px)",
           animation: isVisible
-            ? `contact-char-in 640ms cubic-bezier(0.16, 1, 0.3, 1) ${
+            ? `contact-char-in 960ms cubic-bezier(0.16, 1, 0.3, 1) ${
                 baseDelayMs + idx * staggerMs
               }ms both`
             : "none",
@@ -183,7 +184,7 @@ export default function Contact() {
   }, [handleScrollDelta, renderTrackPosition]);
 
   return (
-    <div className="relative z-20 bg-[linear-gradient(180deg,#34116C_0%,#220B4D_38%,#0F0528_100%)] overflow-x-clip flex flex-col justify-between">
+    <div className="relative z-20 bg-[linear-gradient(180deg,#34116C_0%,#150630_18%,#090218_52%,#04010C_100%)] overflow-x-clip flex flex-col justify-between">
       <style>{`
         @keyframes contact-char-in {
           0% {
@@ -254,14 +255,24 @@ export default function Contact() {
         }
       `}</style>
 
-      {/* Ambient background radial glows */}
+      {/* Ambient background radial glows + Breathing Gradient Bars from Footer up to CTA */}
       <div className="absolute inset-0 z-0 pointer-events-none overflow-hidden">
-        <div className="absolute -top-20 -left-20 w-[520px] h-[520px] bg-[#6D28D9]/35 rounded-full blur-[140px]" />
-        <div className="absolute top-1/3 right-0 w-[460px] h-[460px] bg-[#4C1D95]/25 rounded-full blur-[140px]" />
+        <div className="absolute -top-20 -left-20 w-[520px] h-[520px] bg-[#6D28D9]/22 rounded-full blur-[140px]" />
+        <div className="absolute top-1/3 right-0 w-[460px] h-[460px] bg-[#4C1D95]/18 rounded-full blur-[140px]" />
       </div>
 
-      {/* Main CTA Hero Content (taller section height & larger typography block) */}
-      <div className="relative z-10 min-h-[90vh] md:min-h-[100vh] flex flex-col items-center justify-center px-4 sm:px-6 pt-32 sm:pt-40 md:pt-52 pb-24 sm:pb-32 md:pb-40">
+      <GradientBars
+        numBars={15}
+        gradientFrom="rgba(173, 75, 255, 0.68)"
+        gradientVia="rgba(124, 58, 237, 0.34)"
+        gradientTo="rgba(52, 17, 108, 0)"
+        animationDuration={3.2}
+        minHeight={25}
+        maxHeight={66}
+      />
+
+      {/* Main CTA Hero Content (taller section height & generous top/bottom breathing room) */}
+      <div className="relative z-10 min-h-[105vh] md:min-h-[122vh] lg:min-h-[128vh] flex flex-col items-center justify-center px-4 sm:px-6 pt-44 sm:pt-56 md:pt-64 lg:pt-72 pb-36 sm:pb-48 md:pb-56 lg:pb-64">
         <div
           ref={heroBlockRef}
           className="relative inline-flex flex-col items-center"
@@ -274,7 +285,7 @@ export default function Contact() {
               opacity: isVisible ? 0.95 : 0,
               transform: isVisible ? "scale(1)" : "scale(0)",
               animation: isVisible
-                ? "contact-pop-in 520ms cubic-bezier(0.22, 1, 0.36, 1) 260ms both"
+                ? "contact-pop-in 780ms cubic-bezier(0.22, 1, 0.36, 1) 390ms both"
                 : "none",
             }}
           />
@@ -286,7 +297,7 @@ export default function Contact() {
               opacity: isVisible ? 1 : 0,
               transform: isVisible ? "scale(1)" : "scale(0)",
               animation: isVisible
-                ? "contact-pop-in 560ms cubic-bezier(0.22, 1, 0.36, 1) 180ms both"
+                ? "contact-pop-in 840ms cubic-bezier(0.22, 1, 0.36, 1) 270ms both"
                 : "none",
             }}
           >
@@ -306,7 +317,7 @@ export default function Contact() {
               opacity: isVisible ? 1 : 0,
               transform: isVisible ? "scale(1)" : "scale(0)",
               animation: isVisible
-                ? "contact-pop-in 560ms cubic-bezier(0.22, 1, 0.36, 1) 380ms both"
+                ? "contact-pop-in 840ms cubic-bezier(0.22, 1, 0.36, 1) 570ms both"
                 : "none",
             }}
           >
@@ -326,7 +337,7 @@ export default function Contact() {
               opacity: isVisible ? 1 : 0,
               transform: isVisible ? "scale(1)" : "scale(0)",
               animation: isVisible
-                ? "contact-pop-in 560ms cubic-bezier(0.22, 1, 0.36, 1) 740ms both"
+                ? "contact-pop-in 840ms cubic-bezier(0.22, 1, 0.36, 1) 1110ms both"
                 : "none",
             }}
           >
@@ -346,7 +357,7 @@ export default function Contact() {
               opacity: isVisible ? 0.95 : 0,
               transform: isVisible ? "scale(1)" : "scale(0)",
               animation: isVisible
-                ? "contact-pop-in 520ms cubic-bezier(0.22, 1, 0.36, 1) 960ms both"
+                ? "contact-pop-in 780ms cubic-bezier(0.22, 1, 0.36, 1) 1440ms both"
                 : "none",
             }}
           />
@@ -359,7 +370,7 @@ export default function Contact() {
                 text="INGIN"
                 isVisible={isVisible}
                 baseDelayMs={0}
-                staggerMs={30}
+                staggerMs={45}
                 className="shrink-0"
               />
 
@@ -372,7 +383,7 @@ export default function Contact() {
                     ? "translateY(0) scale(1)"
                     : "translateY(34px) scale(0.84)",
                   animation: isVisible
-                    ? "contact-bubble-up 700ms cubic-bezier(0.16, 1, 0.3, 1) 130ms both"
+                    ? "contact-bubble-up 1050ms cubic-bezier(0.16, 1, 0.3, 1) 195ms both"
                     : "none",
                 }}
               >
@@ -395,7 +406,7 @@ export default function Contact() {
                     ? "translateY(0) scale(1)"
                     : "translateY(-34px) scale(0.84)",
                   animation: isVisible
-                    ? "contact-bubble-down 700ms cubic-bezier(0.16, 1, 0.3, 1) 250ms both"
+                    ? "contact-bubble-down 1050ms cubic-bezier(0.16, 1, 0.3, 1) 375ms both"
                     : "none",
                 }}
               >
@@ -415,8 +426,8 @@ export default function Contact() {
               <AnimatedText
                 text="MENDISKUSIKAN"
                 isVisible={isVisible}
-                baseDelayMs={200}
-                staggerMs={22}
+                baseDelayMs={300}
+                staggerMs={33}
               />
             </div>
 
@@ -430,7 +441,7 @@ export default function Contact() {
                     width: isVisible ? "100%" : "18%",
                     opacity: isVisible ? 1 : 0,
                     transition:
-                      "width 780ms cubic-bezier(0.16, 1, 0.3, 1) 360ms, opacity 300ms ease-out 360ms",
+                      "width 1170ms cubic-bezier(0.16, 1, 0.3, 1) 540ms, opacity 450ms ease-out 540ms",
                   }}
                 >
                   <span
@@ -439,7 +450,7 @@ export default function Contact() {
                       width: isVisible ? "100%" : "0%",
                       opacity: isVisible ? 1 : 0,
                       transition:
-                        "width 740ms cubic-bezier(0.16, 1, 0.3, 1) 460ms, opacity 280ms ease-out 460ms",
+                        "width 1110ms cubic-bezier(0.16, 1, 0.3, 1) 690ms, opacity 420ms ease-out 690ms",
                     }}
                   />
                 </div>
@@ -448,13 +459,13 @@ export default function Contact() {
               <AnimatedText
                 text="SEBUAH"
                 isVisible={isVisible}
-                baseDelayMs={460}
-                staggerMs={28}
+                baseDelayMs={690}
+                staggerMs={42}
                 className="shrink-0"
               />
 
               {/* Pair of Interactive Purple Almond Eyes (pops in + tracks cursor + natural blinks) */}
-              <InteractiveEyes isVisible={isVisible} spawnDelayMs={580} />
+              <InteractiveEyes isVisible={isVisible} spawnDelayMs={870} />
             </div>
 
             {/* Row 4: Long Purple Arrow (elongates 0 -> 100%) + PROJEK + ? (pops at end) */}
@@ -467,7 +478,7 @@ export default function Contact() {
                     width: isVisible ? "100%" : "0%",
                     opacity: isVisible ? 1 : 0,
                     transition:
-                      "width 820ms cubic-bezier(0.16, 1, 0.3, 1) 650ms, opacity 280ms ease-out 650ms",
+                      "width 1230ms cubic-bezier(0.16, 1, 0.3, 1) 975ms, opacity 420ms ease-out 975ms",
                   }}
                 >
                   <div className="flex-1 min-w-0 h-[3.5px] sm:h-[5px] md:h-[6px] lg:h-[7px] bg-[#AD4BFF] rounded-l-full" />
@@ -492,8 +503,8 @@ export default function Contact() {
                 <AnimatedText
                   text="PROJEK"
                   isVisible={isVisible}
-                  baseDelayMs={740}
-                  staggerMs={30}
+                  baseDelayMs={1110}
+                  staggerMs={45}
                 />
                 <span
                   className="inline-block origin-bottom will-change-transform"
@@ -501,7 +512,7 @@ export default function Contact() {
                     opacity: isVisible ? 1 : 0,
                     transform: isVisible ? "scale(1)" : "scale(0)",
                     animation: isVisible
-                      ? "contact-qmark-pop 580ms cubic-bezier(0.22, 1, 0.36, 1) 980ms both"
+                      ? "contact-qmark-pop 870ms cubic-bezier(0.22, 1, 0.36, 1) 1470ms both"
                       : "none",
                   }}
                 >
@@ -518,7 +529,7 @@ export default function Contact() {
               opacity: isVisible ? 1 : 0,
               transform: isVisible ? "translateY(0)" : "translateY(22px)",
               transition:
-                "opacity 680ms cubic-bezier(0.16, 1, 0.3, 1) 1080ms, transform 680ms cubic-bezier(0.16, 1, 0.3, 1) 1080ms",
+                "opacity 1020ms cubic-bezier(0.16, 1, 0.3, 1) 1620ms, transform 1020ms cubic-bezier(0.16, 1, 0.3, 1) 1620ms",
             }}
           >
             <DotBorderButton href="mailto:giterpal@gmail.com">
@@ -528,39 +539,54 @@ export default function Contact() {
         </div>
       </div>
 
-      {/* Giant Edge-to-Edge GITERPAL Text right above Footer (Scroll-Driven with Inertia/Momentum Decay) */}
-      <div
-        aria-hidden="true"
-        className="relative z-10 w-full pointer-events-none select-none overflow-hidden pb-3 sm:pb-4"
-      >
+      {/* Frosted/Diffused Blur Background Zone for Giant GITERPAL Marquee + Footer (soft atmospheric blur, not a bordered glass card) */}
+      <div className="relative z-10 w-full pt-8 sm:pt-10">
+        {/* Seamless top-feathered backdrop blur diffuser over the vertical bars */}
         <div
-          ref={trackRef}
-          className="flex items-center whitespace-nowrap will-change-transform"
+          aria-hidden="true"
+          className="absolute inset-0 pointer-events-none bg-[#0D0522]/50 backdrop-blur-xl"
+          style={{
+            WebkitMaskImage:
+              "linear-gradient(to bottom, transparent 0%, rgba(0,0,0,0.65) 22%, black 42%, black 100%)",
+            maskImage:
+              "linear-gradient(to bottom, transparent 0%, rgba(0,0,0,0.65) 22%, black 42%, black 100%)",
+          }}
+        />
+
+        {/* Giant Edge-to-Edge GITERPAL Text right above Footer (Scroll-Driven with Inertia/Momentum Decay) */}
+        <div
+          aria-hidden="true"
+          className="relative z-10 w-full pointer-events-none select-none overflow-hidden pb-3 sm:pb-4"
         >
-          <div ref={groupRef} className="flex items-center shrink-0">
-            {GITERPAL_REPEATS.map((_, idx) => (
-              <span
-                key={`a-${idx}`}
-                className="font-primary font-bold uppercase text-white/[0.14] text-6xl sm:text-8xl md:text-[118px] lg:text-[140px] leading-none tracking-[0.04em]"
-              >
-                GITERPAL
-              </span>
-            ))}
-          </div>
-          <div className="flex items-center shrink-0">
-            {GITERPAL_REPEATS.map((_, idx) => (
-              <span
-                key={`b-${idx}`}
-                className="font-primary font-bold uppercase text-white/[0.14] text-6xl sm:text-8xl md:text-[118px] lg:text-[140px] leading-none tracking-[0.04em]"
-              >
-                GITERPAL
-              </span>
-            ))}
+          <div
+            ref={trackRef}
+            className="flex items-center whitespace-nowrap will-change-transform"
+          >
+            <div ref={groupRef} className="flex items-center shrink-0">
+              {GITERPAL_REPEATS.map((_, idx) => (
+                <span
+                  key={`a-${idx}`}
+                  className="font-primary font-bold uppercase text-white/[0.16] drop-shadow-[0_4px_24px_rgba(173,75,255,0.2)] text-6xl sm:text-8xl md:text-[118px] lg:text-[140px] leading-none tracking-[0.04em]"
+                >
+                  GITERPAL
+                </span>
+              ))}
+            </div>
+            <div className="flex items-center shrink-0">
+              {GITERPAL_REPEATS.map((_, idx) => (
+                <span
+                  key={`b-${idx}`}
+                  className="font-primary font-bold uppercase text-white/[0.16] drop-shadow-[0_4px_24px_rgba(173,75,255,0.2)] text-6xl sm:text-8xl md:text-[118px] lg:text-[140px] leading-none tracking-[0.04em]"
+                >
+                  GITERPAL
+                </span>
+              ))}
+            </div>
           </div>
         </div>
-      </div>
 
-      <Footer />
+        <Footer />
+      </div>
     </div>
   );
 }
