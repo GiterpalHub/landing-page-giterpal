@@ -59,7 +59,9 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="id">
-      <body className={`${syne.variable} ${jakartaSans.variable} antialiased`}>
+      <body
+        className={`${syne.variable} ${jakartaSans.variable} antialiased selection:bg-[#7C3AED] selection:text-white`}
+      >
         <SmoothScroll>
           <Navbar />
           {children}

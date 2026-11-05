@@ -54,6 +54,16 @@
 }
 
 @layer base {
+  ::selection {
+    background-color: #7C3AED;
+    color: #FFFFFF;
+  }
+
+  ::-moz-selection {
+    background-color: #7C3AED;
+    color: #FFFFFF;
+  }
+
   html {
     scroll-behavior: auto !important;
   }
