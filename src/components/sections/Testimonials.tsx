@@ -123,7 +123,7 @@ export default function Testimonials() {
 
     handleScroll();
 
-    window.addEventListener("scroll", handleScroll);
+    window.addEventListener("scroll", handleScroll, { passive: true });
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
@@ -159,10 +159,10 @@ export default function Testimonials() {
     : 0;
 
   return (
-    <div ref={containerRef} className="relative h-[500vh] bg-[#4A148C] z-10">
+    <div ref={containerRef} className="relative h-[500vh] bg-[#4A148C] z-10 font-secondary">
       <div className="sticky top-0 h-screen w-full overflow-hidden flex items-center justify-center perspective-container">
         <div
-          className="absolute z-50 flex flex-col items-center justify-center pointer-events-none text-center px-4 w-full transition-transform duration-75 ease-linear"
+          className="absolute z-50 flex flex-col items-center justify-center pointer-events-none text-center px-4 w-full transition-transform duration-75 ease-linear font-secondary"
           style={{
             opacity: textOpacity,
             transform: textTransform,
@@ -171,10 +171,7 @@ export default function Testimonials() {
             display: textOpacity <= 0.01 ? "none" : "flex",
           }}
         >
-          <h2
-            className="text-5xl md:text-9xl font-bold text-white drop-shadow-lg"
-            style={{ fontFamily: "cursive" }}
-          >
+          <h2 className="text-5xl md:text-8xl lg:text-9xl font-extrabold text-white drop-shadow-lg tracking-tight font-secondary">
             {letters.map((char, index) => {
               const isTyped = index < visibleLetterCount;
 
@@ -202,7 +199,7 @@ export default function Testimonials() {
         </div>
 
         <div
-          className="relative w-full h-full flex items-center justify-center transform-style-3d"
+          className="relative w-full h-full flex items-center justify-center transform-style-3d font-secondary"
           style={{
             visibility: showCards ? "visible" : "hidden",
             opacity: showCards ? 1 : 0,
@@ -229,7 +226,7 @@ export default function Testimonials() {
             return (
               <div
                 key={item.id}
-                className="absolute p-6 rounded-2xl shadow-2xl border border-white/10 flex items-center gap-4 w-[320px] md:w-[450px] backdrop-blur-md"
+                className="absolute p-6 rounded-2xl shadow-2xl border border-white/10 flex items-center gap-4 w-[320px] md:w-[450px] backdrop-blur-md font-secondary"
                 style={{
                   backgroundColor: "rgba(30, 30, 46, 0.9)",
 
@@ -246,12 +243,12 @@ export default function Testimonials() {
                     className="rounded-full object-cover border-2 border-[#FFD700]"
                   />
                 </div>
-                <div className="text-white">
-                  <h3 className="text-lg md:text-xl font-bold uppercase text-[#FFD700]">
+                <div className="text-white font-secondary">
+                  <h3 className="text-lg md:text-xl font-bold uppercase text-[#FFD700] tracking-wide">
                     {item.name}
                   </h3>
-                  <p className="text-xs text-gray-300 mb-1">{item.role}</p>
-                  <p className="text-sm text-gray-100 leading-tight">
+                  <p className="text-xs text-gray-300 mb-1 font-medium">{item.role}</p>
+                  <p className="text-sm text-gray-100 leading-snug font-normal">
                     {item.text}
                   </p>
                 </div>

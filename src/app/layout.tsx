@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Plus_Jakarta_Sans, Syne } from "next/font/google";
 import "./globals.css";
 import Navbar from "@/components/layout/Navbar";
+import SmoothScroll from "@/components/layout/SmoothScroll";
 
 const syne = Syne({
   subsets: ["latin"],
@@ -59,8 +60,10 @@ export default function RootLayout({
   return (
     <html lang="id">
       <body className={`${syne.variable} ${jakartaSans.variable} antialiased`}>
-        <Navbar />
-        {children}
+        <SmoothScroll>
+          <Navbar />
+          {children}
+        </SmoothScroll>
       </body>
     </html>
   );
