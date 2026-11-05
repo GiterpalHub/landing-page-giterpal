@@ -49,7 +49,7 @@ const InteractiveHoverButton = React.forwardRef<
     switch (variant) {
       case "nav-inactive":
         outerStyles =
-          "border-white/30 bg-white/10 hover:border-white/60 text-white backdrop-blur-md shadow-sm";
+          "border-white/30 hover:border-transparent bg-white/10 text-white backdrop-blur-md shadow-sm";
         dotStyles =
           "bg-white group-hover:bg-gradient-to-r group-hover:from-[#AD4BFF] group-hover:to-[#6828EA]";
         textIdleStyles = "text-white";
@@ -58,7 +58,7 @@ const InteractiveHoverButton = React.forwardRef<
 
       case "nav-active":
         outerStyles =
-          "border-primary/25 bg-primary/5 hover:border-primary/50 text-primary shadow-sm";
+          "border-primary/25 hover:border-transparent bg-primary/5 text-primary shadow-sm";
         dotStyles =
           "bg-primary group-hover:bg-[#AD4BFF] group-hover:shadow-[0_0_20px_rgba(173,75,255,0.45)]";
         textIdleStyles = "text-primary";
@@ -67,7 +67,7 @@ const InteractiveHoverButton = React.forwardRef<
 
       case "purple":
         outerStyles =
-          "border-[#AD4BFF]/50 bg-[#AD4BFF]/10 hover:border-[#AD4BFF] text-white";
+          "border-[#AD4BFF]/50 hover:border-transparent bg-[#AD4BFF]/10 text-white";
         dotStyles = "bg-[#AD4BFF] group-hover:bg-[#AD4BFF]";
         textIdleStyles = "text-white";
         textHoverStyles = "text-white";
@@ -75,7 +75,7 @@ const InteractiveHoverButton = React.forwardRef<
 
       case "glass":
         outerStyles =
-          "border-white/20 bg-white/10 hover:border-white/40 text-white backdrop-blur-md";
+          "border-white/20 hover:border-transparent bg-white/10 text-white backdrop-blur-md";
         dotStyles = "bg-white group-hover:bg-[#AD4BFF]";
         textIdleStyles = "text-white";
         textHoverStyles = "text-white";
@@ -84,7 +84,7 @@ const InteractiveHoverButton = React.forwardRef<
       case "default":
       default:
         outerStyles =
-          "border-input bg-background hover:bg-accent text-foreground";
+          "border-input hover:border-transparent bg-background text-foreground";
         dotStyles = "bg-primary group-hover:bg-primary";
         textIdleStyles = "text-foreground";
         textHoverStyles = "text-primary-foreground";
@@ -132,7 +132,7 @@ const InteractiveHoverButton = React.forwardRef<
     const commonClasses = cn(
       "group relative inline-flex h-10 min-w-[136px] items-center justify-center cursor-pointer",
       "overflow-hidden rounded-full border px-4 py-2 font-secondary font-semibold select-none",
-      "transition-colors duration-300 ease-out",
+      "transition-all duration-300 ease-out hover:border-transparent",
       outerStyles,
       className
     );
