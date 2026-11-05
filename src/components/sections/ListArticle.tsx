@@ -51,7 +51,7 @@ export default function ListArticle({ initialArticles }: { initialArticles: Arti
                 {filteredArticles.length > 0 ? (
                     filteredArticles.map((article) => (
                         <CardArtikel
-                            theme="glass"
+                            theme="light"
                             key={article.slug}
                             slug={article.slug}
                             author={article.author}

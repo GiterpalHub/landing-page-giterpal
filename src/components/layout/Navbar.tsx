@@ -13,7 +13,7 @@ const navigationItems = [
   { label: "Beranda", href: "/#hero" },
   { label: "Karya", href: "/#project" },
   { label: "Testimoni", href: "/#testimonials" },
-  { label: "Artikel", href: "/#article" },
+  { label: "Artikel", href: "/articles" },
   { label: "Tentang Kami", href: "/#about" },
 ];
 
