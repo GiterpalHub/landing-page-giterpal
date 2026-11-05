@@ -8,7 +8,7 @@ import { useEffect, useState } from "react";
 import { useLenis } from "lenis/react";
 import IconButton from "../IconButton";
 import OutlineButton from "../OutlineButton";
-import ButtonWithIcon from "../ui/button-with-icon";
+import InteractiveHoverButton from "../ui/interactive-hover-button";
 
 const navigationItems = [
   { label: "Beranda", href: "/#hero" },
@@ -118,14 +118,13 @@ export default function Navbar() {
         </div>
 
         <div className="hidden md:flex items-center">
-          <ButtonWithIcon
+          <InteractiveHoverButton
             href="/#contact"
             onClick={(e) => handleNavClick(e, "/#contact")}
             variant={isActive ? "nav-active" : "nav-inactive"}
-            size="sm"
           >
             Kontak Kami
-          </ButtonWithIcon>
+          </InteractiveHoverButton>
         </div>
 
         <button

@@ -64,28 +64,16 @@ export default function Article() {
     }
   }, []);
 
-  const lenis = useLenis();
-  const lenisRef = useRef(lenis);
-  lenisRef.current = lenis;
-
   useLenis(() => {
     applyParallax();
   });
 
   useEffect(() => {
     applyParallax();
-
-    // Fallback native scroll listener only if Lenis is not active
-    const onScroll = () => {
-      if (!lenisRef.current) {
-        applyParallax();
-      }
-    };
-
-    window.addEventListener("scroll", onScroll, { passive: true });
+    window.addEventListener("scroll", applyParallax, { passive: true });
     window.addEventListener("resize", applyParallax);
     return () => {
-      window.removeEventListener("scroll", onScroll);
+      window.removeEventListener("scroll", applyParallax);
       window.removeEventListener("resize", applyParallax);
     };
   }, [applyParallax]);

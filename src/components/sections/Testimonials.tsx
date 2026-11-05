@@ -1,8 +1,7 @@
 "use client";
 
-import { useEffect, useRef, useState, useCallback } from "react";
+import { useEffect, useRef, useState } from "react";
 import Image from "next/image";
-import { useLenis } from "lenis/react";
 import Avatar from "@/assets/Avatar.png";
 
 const testimonialsData = [
@@ -103,44 +102,30 @@ const HEADING_TEXT = "Apa Kata Mereka";
 export default function Testimonials() {
   const containerRef = useRef<HTMLDivElement>(null);
   const [scrollProgress, setScrollProgress] = useState(0);
-  const lenis = useLenis();
-  const lenisRef = useRef(lenis);
-  lenisRef.current = lenis;
-
-  const updateProgress = useCallback(() => {
-    if (!containerRef.current) return;
-
-    const rect = containerRef.current.getBoundingClientRect();
-    const viewportHeight = window.innerHeight;
-    const scrollDistance = rect.height - viewportHeight;
-    const scrolled = -rect.top;
-
-    let progress = scrolled / scrollDistance;
-    progress = Math.max(0, Math.min(1, progress));
-    setScrollProgress(progress);
-  }, []);
-
-  useLenis(() => {
-    updateProgress();
-  });
 
   useEffect(() => {
-    updateProgress();
+    const handleScroll = () => {
+      if (!containerRef.current) return;
 
-    // Fallback native scroll listener only if Lenis is not active
-    const onScroll = () => {
-      if (!lenisRef.current) {
-        updateProgress();
-      }
+      const rect = containerRef.current.getBoundingClientRect();
+      const viewportHeight = window.innerHeight;
+
+      const scrollDistance = rect.height - viewportHeight;
+
+      const scrolled = -rect.top;
+
+      let progress = scrolled / scrollDistance;
+
+      progress = Math.max(0, Math.min(1, progress));
+
+      setScrollProgress(progress);
     };
 
-    window.addEventListener("scroll", onScroll, { passive: true });
-    window.addEventListener("resize", updateProgress);
-    return () => {
-      window.removeEventListener("scroll", onScroll);
-      window.removeEventListener("resize", updateProgress);
-    };
-  }, [updateProgress]);
+    handleScroll();
+
+    window.addEventListener("scroll", handleScroll, { passive: true });
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
 
   const PHASE_TYPING_END = 0.2;
 
@@ -177,7 +162,7 @@ export default function Testimonials() {
     <div ref={containerRef} className="relative h-[500vh] bg-[#4A148C] z-10 font-secondary">
       <div className="sticky top-0 h-screen w-full overflow-hidden flex items-center justify-center perspective-container">
         <div
-          className="absolute z-50 flex flex-col items-center justify-center pointer-events-none text-center px-4 w-full will-change-transform font-secondary"
+          className="absolute z-50 flex flex-col items-center justify-center pointer-events-none text-center px-4 w-full transition-transform duration-75 ease-linear font-secondary"
           style={{
             opacity: textOpacity,
             transform: textTransform,
