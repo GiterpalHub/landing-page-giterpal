@@ -3,7 +3,6 @@
 import { useEffect, useState, useRef } from "react";
 import { useLenis } from "lenis/react";
 import CardMission from "../CardMission";
-import GlowButton from "../GlowButton";
 import BlurOutUp from "../ui/blur-out-up";
 import StarTrail from "@/assets/star-trail.svg";
 import Image from "next/image";
@@ -342,19 +341,6 @@ export default function Hero() {
     };
   }, [lenis]);
 
-  const scrollOneScreen = () => {
-    const pinY = visiSectionRef.current?.offsetTop ?? window.innerHeight;
-    if (lenis) {
-      lenis.scrollTo(pinY, { duration: 1.2 });
-    } else {
-      window.scrollTo({
-        top: pinY,
-        left: 0,
-        behavior: "smooth",
-      });
-    }
-  };
-
   const highlightConfig: Record<string, { color: string; className: string }> =
     {
       mahasiswa: { color: "#FF5FFA", className: "font-bold" },
@@ -501,15 +487,6 @@ export default function Hero() {
                 className="font-secondary text-sm sm:text-base md:text-xl lg:text-[22px] text-center text-white/90 max-w-xs sm:max-w-xl md:max-w-2xl mx-auto leading-relaxed"
               />
             </div>
-          </div>
-
-          <div className="animate-fade-in-up delay-300 pt-1">
-            <GlowButton
-              onClick={scrollOneScreen}
-              className="rounded-full px-8 py-3.5 text-sm md:text-base tracking-wider shadow-[0_0_28px_rgba(192,132,252,0.75),0_0_14px_rgba(255,255,255,0.85)] hover:shadow-[0_0_36px_rgba(192,132,252,0.95),0_0_20px_rgba(255,255,255,1)] hover:scale-105"
-            >
-              <span>MULAI</span>
-            </GlowButton>
           </div>
         </div>
       </div>
