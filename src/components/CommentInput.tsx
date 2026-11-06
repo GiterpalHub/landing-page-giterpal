@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef, FormEvent, useState } from "react";
+import { useRef, FormEvent, KeyboardEvent, useState } from "react";
 
 interface CommentInputProps {
   onSubmit: (text: string) => void;
@@ -28,6 +28,13 @@ export default function CommentInput({ onSubmit, placeholder = "Tulis komentar k
     }
   };
 
+  const handleKeyDown = (e: KeyboardEvent<HTMLTextAreaElement>) => {
+    if (e.key === "Enter" && !e.shiftKey) {
+      e.preventDefault(); 
+      handleSubmit();     
+    }
+  };
+
   return (
     <div className="w-full font-secondary mt-2">
       <textarea
@@ -35,6 +42,7 @@ export default function CommentInput({ onSubmit, placeholder = "Tulis komentar k
         value={text}
         onInput={handleInput}
         onChange={(e) => setText(e.target.value)}
+        onKeyDown={handleKeyDown} 
         placeholder={placeholder}
         rows={1}
         autoFocus={autoFocus}

@@ -1,13 +1,21 @@
-import Image, { StaticImageData } from 'next/image';
+import Image from 'next/image';
 import { UserRound, CalendarDays } from 'lucide-react';
 import Link from 'next/link';
 
 interface CardArtikelProps {
+<<<<<<< HEAD
   coverImage: StaticImageData;
   title: string;
   author: string;
   date: string;
   slug: string;
+=======
+  coverImage: string,
+  title: string,
+  author: string,
+  date: string,
+  slug: string
+>>>>>>> e633713 (feat: add anonymous feedback form to project detail)
 }
 
 export default function CardArtikelMobile({ title, author, date, coverImage, slug }: CardArtikelProps) {
