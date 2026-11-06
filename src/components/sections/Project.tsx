@@ -59,7 +59,7 @@ export default function Project() {
         />
         <BlurOutUp
           as="p"
-          text="Saksikan bagaimana ide-ide brilian bertransformasi menjadi solusi nyata. Inilah etalase inovasi dan kolaborasi teknis dari talenta terbaik Giterpal Hub."
+          text="Bagaimana ide-ide bertransformasi menjadi solusi nyata. Inilah etalase inovasi dan kolaborasi teknis dari Giterpal Hub"
           staggerDelay={2}
           className="text-sm sm:text-base md:text-lg font-secondary max-w-md md:max-w-lg text-white/90 md:text-right leading-relaxed"
         />

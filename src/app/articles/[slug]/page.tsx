@@ -112,15 +112,9 @@ export default function ArticleDetailPage({ params }: ArticlePageProps) {
         </div>
 
         <div className="grid grid-cols-1 gap-8 lg:grid-cols-3">
-          <div className="rounded-[28px] sm:rounded-[32px] border border-white/20 bg-white/10 p-6 sm:p-10 lg:p-12 shadow-[0_8px_32px_rgba(0,0,0,0.2)] backdrop-blur-xl lg:col-span-2">
+          <div className="rounded-[14px] sm:rounded-[16px] border border-white/20 bg-white/10 p-6 sm:p-10 lg:p-12 shadow-[0_8px_32px_rgba(0,0,0,0.2)] backdrop-blur-xl lg:col-span-2">
             <article>
               <header className="mb-8">
-                <div className="mb-4 inline-flex items-center gap-2">
-                  <span className="font-secondary rounded-full bg-white px-3.5 py-1 text-xs font-bold uppercase tracking-wider text-[#110C4C] shadow-sm">
-                    {article.category}
-                  </span>
-                </div>
-
                 <h1 className="break-words font-secondary text-2xl font-bold leading-[1.25] tracking-tight text-white sm:text-3xl md:text-4xl lg:text-[42px] mb-6">
                   {article.title}
                 </h1>
@@ -138,11 +132,11 @@ export default function ArticleDetailPage({ params }: ArticlePageProps) {
                     <span>{article.date}</span>
                   </div>
                   <span className="text-white/30">•</span>
-                  <span className="text-white/60">3 menit baca</span>
+                  <span className="font-medium text-white/90">{article.category}</span>
                 </div>
               </header>
 
-              <div className="relative mb-10 overflow-hidden rounded-[20px] md:rounded-[24px] border border-white/15 bg-black/20 shadow-2xl">
+              <div className="relative mb-10 overflow-hidden rounded-[10px] md:rounded-[12px] border border-white/15 bg-black/20 shadow-2xl">
                 <Image
                   src={article.coverImage}
                   alt={`Sampul artikel: ${article.title}`}

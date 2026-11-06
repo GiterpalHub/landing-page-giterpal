@@ -129,7 +129,7 @@ export default function Article() {
           />
           <BlurOutUp
             as="p"
-            text="Temukan berita artikel yang sesuai dengan minat. Kami menyajikan berbagai macam artikel yang membahas tentang teknologi. Silakan klik judul artikel untuk membaca lebih lanjut."
+            text="Temukan berita artikel yang sesuai dengan minat. Kami menyajikan berbagai macam artikel yang membahas tentang teknologi."
             staggerDelay={2}
             className="md:text-right font-secondary text-xs sm:text-sm text-[#110C4C]/80 max-w-md leading-relaxed"
           />

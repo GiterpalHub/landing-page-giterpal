@@ -33,7 +33,7 @@ const CardArtikel = ({
       >
         <div
           className="
-            flex flex-col relative h-full overflow-hidden rounded-[20px]
+            flex flex-col relative h-full overflow-hidden rounded-[10px]
             p-4 sm:p-5 bg-white/10 border border-white/20 backdrop-blur-xl
             shadow-[0_4px_20px_rgba(0,0,0,0.15)]
             transition-all duration-300 ease-out
@@ -41,7 +41,7 @@ const CardArtikel = ({
             hover:shadow-[0_16px_36px_rgba(255,255,255,0.12)] hover:-translate-y-1.5
           "
         >
-          <div className="relative w-full h-48 sm:h-52 shrink-0 overflow-hidden rounded-[12px] mb-4 border border-white/10">
+          <div className="relative w-full h-48 sm:h-52 shrink-0 overflow-hidden rounded-[6px] mb-4 border border-white/10">
             <Image
               src={coverImage}
               alt={`Sampul artikel: ${title}`}
@@ -81,7 +81,7 @@ const CardArtikel = ({
     >
       <div
         className="
-          flex flex-col relative h-full overflow-hidden rounded-[20px]
+          flex flex-col relative h-full overflow-hidden rounded-[10px]
           p-4 sm:p-5 bg-white border border-[#9B72F2]/60
           shadow-[0_4px_20px_rgba(17,12,76,0.04)]
           transition-all duration-300 ease-out
@@ -89,7 +89,7 @@ const CardArtikel = ({
           hover:shadow-[0_16px_36px_rgba(98,60,234,0.28)] hover:-translate-y-1.5
         "
       >
-        <div className="relative w-full h-48 sm:h-52 shrink-0 overflow-hidden rounded-[12px] mb-4">
+        <div className="relative w-full h-48 sm:h-52 shrink-0 overflow-hidden rounded-[6px] mb-4">
           <Image
             src={coverImage}
             alt={`Sampul artikel: ${title}`}

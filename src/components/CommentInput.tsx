@@ -38,7 +38,7 @@ export default function CommentInput({ onSubmit, placeholder = "Tulis komentar k
         placeholder={placeholder}
         rows={1}
         autoFocus={autoFocus}
-        className="max-h-[300px] min-h-[70px] w-full resize-none overflow-y-auto rounded-3xl border border-white/20 bg-black/20 px-5 py-4 text-base md:text-lg text-white outline-none backdrop-blur-md placeholder:text-white/40 focus:border-[#6F2ED6]/50 focus:bg-black/40 transition-all"
+        className="max-h-[300px] min-h-[70px] w-full resize-none overflow-y-auto rounded-xl border border-white/20 bg-black/20 px-5 py-4 text-base md:text-lg text-white outline-none backdrop-blur-md placeholder:text-white/40 focus:border-[#6F2ED6]/50 focus:bg-black/40 transition-all"
       />
 
       <div className="mt-3 flex justify-end">

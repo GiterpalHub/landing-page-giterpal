@@ -2,22 +2,21 @@ import Image, { StaticImageData } from 'next/image';
 import { UserRound, CalendarDays } from 'lucide-react';
 import Link from 'next/link';
 
-
 interface CardArtikelProps {
-  coverImage: StaticImageData,
-  title: string,
-  author: string,
-  date: string,
-  slug: string
+  coverImage: StaticImageData;
+  title: string;
+  author: string;
+  date: string;
+  slug: string;
 }
 
 export default function CardArtikelMobile({ title, author, date, coverImage, slug }: CardArtikelProps) {
   return (
     <Link
       href={`/articles/${slug}`}
-      className="group flex flex-row items-start gap-4 overflow-hidden rounded-2xl border border-white/20 bg-white/10 p-3.5 backdrop-blur-xl transition-all duration-300 hover:border-white/40 hover:shadow-[0_0_40px_rgba(255,255,255,0.25)] lg:hidden"
+      className="group flex flex-row items-start gap-4 overflow-hidden rounded-[8px] border border-white/20 bg-white/10 p-3.5 backdrop-blur-xl transition-all duration-300 hover:border-white/40 hover:shadow-[0_0_40px_rgba(255,255,255,0.25)] lg:hidden"
     >
-      <div className="relative w-24 h-24 shrink-0 overflow-hidden rounded-xl bg-white">
+      <div className="relative w-24 h-24 shrink-0 overflow-hidden rounded-[6px] bg-white">
         <Image
           src={coverImage}
           alt={`Sampul artikel: ${title}`}

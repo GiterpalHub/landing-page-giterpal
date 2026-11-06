@@ -1,7 +1,19 @@
 import type { StaticImageData } from "next/image";
-import aiImage from "@/assets/projects/sample-1.png";
-import webImage from "@/assets/projects/sample-2.png";
-import frontendImage from "@/assets/projects/sample-3.png";
+import {
+  articlePlaceholder1,
+  articlePlaceholder2,
+  articlePlaceholder3,
+  articlePlaceholder4,
+  articlePlaceholder5,
+} from "@/assets/article placeholder";
+
+export {
+  articlePlaceholder1,
+  articlePlaceholder2,
+  articlePlaceholder3,
+  articlePlaceholder4,
+  articlePlaceholder5,
+};
 
 export interface Article {
   slug: string;
@@ -23,7 +35,7 @@ export const articles: Article[] = [
     date: "15 Januari 2026",
     excerpt:
       "AI dapat membantu mahasiswa memahami konsep teknis lebih cepat, selama digunakan untuk berdiskusi dan bereksperimen, bukan sekadar menyalin jawaban.",
-    coverImage: aiImage,
+    coverImage: articlePlaceholder1,
     content: [
       "Perkembangan kecerdasan buatan membuat cara kita belajar pemrograman ikut berubah. Sebagai mahasiswa, kita dapat menggunakan AI untuk memecah konsep yang rumit, mencari sudut pandang alternatif, dan mendapatkan umpan balik lebih cepat ketika mengerjakan proyek.",
       "Namun, AI sebaiknya diposisikan sebagai partner belajar, bukan pengganti proses berpikir. Sebelum meminta solusi, jelaskan masalah dengan bahasa sendiri dan tuliskan pendekatan yang sudah dicoba. Kebiasaan ini membantu kita memahami alasan di balik setiap perubahan kode.",
@@ -39,7 +51,7 @@ export const articles: Article[] = [
     date: "12 Januari 2026",
     excerpt:
       "Proyek yang baik dimulai dari masalah yang ingin diselesaikan. Pelajari cara mengubah observasi sederhana menjadi produk digital yang terukur.",
-    coverImage: webImage,
+    coverImage: articlePlaceholder2,
     content: [
       "Banyak proyek mahasiswa dimulai dari teknologi yang sedang populer, lalu mencari masalah yang cocok setelahnya. Pendekatan ini tidak selalu salah, tetapi sering membuat produk kehilangan arah. Memulai dari masalah nyata membantu tim memahami siapa pengguna dan mengapa solusi tersebut penting.",
       "Mulailah dengan observasi sederhana. Catat proses yang berulang, informasi yang sulit ditemukan, atau aktivitas yang masih dilakukan secara manual. Setelah itu, lakukan wawancara singkat dengan calon pengguna untuk memastikan bahwa masalah tersebut benar-benar dirasakan.",
@@ -55,7 +67,7 @@ export const articles: Article[] = [
     date: "10 Januari 2026",
     excerpt:
       "Tidak ada framework yang paling benar untuk semua proyek. Pertimbangkan kebutuhan produk, kemampuan tim, ekosistem, dan waktu pengerjaan sebelum memilih.",
-    coverImage: frontendImage,
+    coverImage: articlePlaceholder3,
     content: [
       "Perdebatan mengenai framework frontend sering berfokus pada performa atau popularitas. Untuk proyek mahasiswa, pertimbangan yang lebih penting adalah apakah tim dapat memahami alat tersebut dan menyelesaikan kebutuhan produk dengan konsisten.",
       "Next.js cocok untuk tim yang membutuhkan routing, rendering server, optimasi gambar, dan struktur aplikasi yang terintegrasi. React dengan tooling yang lebih sederhana dapat menjadi pilihan baik untuk prototype atau aplikasi satu halaman. Framework lain juga memiliki keunggulan masing-masing.",

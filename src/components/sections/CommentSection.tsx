@@ -5,7 +5,7 @@ import { useState } from "react";
 import CommentInput from "../CommentInput";
 
 const avatarClass = "flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-[#6F2ED6] text-lg font-bold text-white shadow-md";
-const bubbleClass = "flex-1 rounded-2xl rounded-tl-none border border-white/10 bg-black/20 px-5 py-4 backdrop-blur-sm";
+const bubbleClass = "flex-1 rounded-[8px] rounded-tl-none border border-white/10 bg-black/20 px-5 py-4 backdrop-blur-sm";
 const pillClass = "rounded-full bg-white/10 px-4 py-1 text-xs font-medium text-white transition hover:bg-white/20";
 const pillActiveClass = "rounded-full bg-[#6F2ED6] px-4 py-1 text-xs font-medium text-white transition shadow-[0_0_10px_rgba(111,46,214,0.5)]";
 
