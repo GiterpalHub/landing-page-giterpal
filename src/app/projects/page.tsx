@@ -3,7 +3,7 @@ import Image from "next/image";
 import Star2 from "@/assets/star2.svg";
 import Star3 from "@/assets/star3.svg";
 import Star5 from "@/assets/star5.svg";
-import BgStart from "@/assets/bgstart.png";
+import BgStart from "@/assets/bgstart.webp";
 import ProjectGallery from "@/components/sections/ProjectGallery";
 import Footer from "@/components/layout/Footer";
 

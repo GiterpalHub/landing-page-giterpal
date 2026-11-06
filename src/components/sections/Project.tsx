@@ -3,7 +3,7 @@ import Marquee from "react-fast-marquee";
 import ButtonWithIcon from "../ui/button-with-icon";
 import BlurOutUp from "../ui/blur-out-up";
 
-import GridTexture from "@/assets/textures/grid.png";
+import GridTexture from "@/assets/textures/grid.webp";
 import Image from "next/image";
 import Link from "next/link";
 import { projects } from "@/lib/data/projects";

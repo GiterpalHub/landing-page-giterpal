@@ -3,7 +3,7 @@
 import { useCallback, useEffect, useRef } from "react";
 import Image from "next/image";
 import { useLenis } from "lenis/react";
-import Avatar from "@/assets/Avatar.png";
+import Avatar from "@/assets/Avatar.webp";
 import { BackgroundGradientAnimation } from "../ui/background-gradient-animation";
 import Signature, { type SignatureHandle } from "../ui/signature";
 

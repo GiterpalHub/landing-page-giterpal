@@ -2,9 +2,9 @@
 
 import Image from "next/image";
 
-import Lanyard1 from "@/assets/lanyard1.png";
-import Lanyard2 from "@/assets/lanyard2.png";
-import Lanyard3 from "@/assets/lanyard3.png";
+import Lanyard1 from "@/assets/lanyard1.webp";
+import Lanyard2 from "@/assets/lanyard2.webp";
+import Lanyard3 from "@/assets/lanyard3.webp";
 
 export default function LanyardDivider() {
   return (

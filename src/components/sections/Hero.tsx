@@ -8,20 +8,20 @@ import StarTrail from "@/assets/star-trail.svg";
 import Image from "next/image";
 
 import cloudImage from "@/assets/cloud.svg";
-import Planet1 from "@/assets/palent1.png";
-import Planet2 from "@/assets/planet2.png";
-import Moon from "@/assets/moon.png";
-import Flare from "@/assets/flare.png";
-import Light1 from "@/assets/light1.png";
-import BgStart from "@/assets/bgstart.png";
+import Planet1 from "@/assets/palent1.webp";
+import Planet2 from "@/assets/planet2.webp";
+import Moon from "@/assets/moon.webp";
+import Flare from "@/assets/flare.webp";
+import Light1 from "@/assets/light1.webp";
+import BgStart from "@/assets/bgstart.webp";
 
 import Star2 from "@/assets/star2.svg";
 import Star3 from "@/assets/star3.svg";
 import Star5 from "@/assets/star5.svg";
 import StarLeftText from "@/assets/star left text.svg";
 import StarRightText from "@/assets/star right text.svg";
-import RocketImg from "@/assets/Rocket.png";
-import FlareRocket from "@/assets/flare rocket.png";
+import RocketImg from "@/assets/Rocket.webp";
+import FlareRocket from "@/assets/flare rocket.webp";
 import IconMisi1 from "@/assets/icon misi/1.svg";
 import IconMisi2 from "@/assets/icon misi/2.svg";
 import IconMisi3 from "@/assets/icon misi/3.svg";

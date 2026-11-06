@@ -2,7 +2,7 @@ import Image from "next/image";
 import { articles } from "@/lib/data/articles";
 import Star2 from "@/assets/star2.svg";
 import Star5 from "@/assets/star5.svg";
-import BgStart from "@/assets/bgstart.png";
+import BgStart from "@/assets/bgstart.webp";
 import Star3 from "@/assets/star3.svg";
 import { Metadata } from "next";
 import ListArticle from "@/components/sections/ListArticle";
