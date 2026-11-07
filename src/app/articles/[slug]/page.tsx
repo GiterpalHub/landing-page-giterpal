@@ -14,7 +14,7 @@ import BgStart from "@/assets/bgstart.webp";
 import { Button } from "@/components/ui/button";
 import ShareButton from "@/components/ShareButton";
 import CommentSection from "@/components/sections/CommentSection";
-import { createClient } from "@/lib/supabase";
+import { pool } from "@/lib/db";
 
 interface ArticlePageProps {
   params: {
@@ -24,15 +24,25 @@ interface ArticlePageProps {
 
 const getCachedArticle = unstable_cache(
   async (slug: string) => {
-    const supabase = createClient();
-    const { data, error } = await supabase
-      .from("articles")
-      .select("*")
-      .eq("slug", slug)
-      .single();
-
-    if (error || !data) return null;
-    return data;
+    try {
+      const res = await pool.query(
+        "SELECT id, slug, title, category, author, to_char(published_date, 'YYYY-MM-DD') as published_date, excerpt, cover_image, content FROM articles WHERE slug = $1 LIMIT 1",
+        [slug]
+      );
+      if (!res.rows.length) return null;
+      const article = res.rows[0];
+      if (typeof article.content === "string") {
+        try {
+          article.content = JSON.parse(article.content);
+        } catch {
+          article.content = [article.content];
+        }
+      }
+      return article;
+    } catch (err) {
+      console.error("Error fetching article by slug:", err);
+      return null;
+    }
   },
   ["article-detail-cache"],
   {
@@ -41,8 +51,13 @@ const getCachedArticle = unstable_cache(
 );
 
 export async function generateStaticParams() {
-  const { data: articles } = await createClient().from("articles").select("slug");
-  return articles?.map((article) => ({ slug: article.slug })) || [];
+  try {
+    const res = await pool.query("SELECT slug FROM articles");
+    return res.rows.map((row) => ({ slug: row.slug }));
+  } catch (err) {
+    console.error("Error generating static params for articles:", err);
+    return [];
+  }
 }
 
 export async function generateMetadata({
@@ -65,7 +80,13 @@ export async function generateMetadata({
       type: "article",
       publishedTime: article.published_date,
       authors: [article.author],
-      images: [{ url: `${process.env.NEXT_PUBLIC_STORAGE_URL}/article/${article.cover_image}` }],
+      images: [
+        {
+          url: (process.env.NEXT_PUBLIC_STORAGE_URL || "/storage").startsWith("http")
+            ? `${process.env.NEXT_PUBLIC_STORAGE_URL}/article/${article.cover_image}`
+            : `${process.env.NEXT_PUBLIC_SITE_URL || "https://giterpal.my.id"}${process.env.NEXT_PUBLIC_STORAGE_URL || "/storage"}/article/${article.cover_image}`,
+        },
+      ],
     },
   };
 }
@@ -79,6 +100,17 @@ function formatDate(dateString: string) {
   });
 }
 
+interface ArticleItem {
+  id: string;
+  slug: string;
+  title: string;
+  category: string;
+  author: string;
+  published_date: string;
+  excerpt: string;
+  cover_image: string;
+}
+
 export default async function ArticleDetailPage({ params }: ArticlePageProps) {
   const article = await getCachedArticle(params.slug);
 
@@ -86,11 +118,16 @@ export default async function ArticleDetailPage({ params }: ArticlePageProps) {
     notFound();
   }
 
-  const { data: otherArticles } = await createClient()
-    .from("articles")
-    .select("*")
-    .neq("slug", params.slug)
-    .limit(3);
+  let otherArticles: ArticleItem[] = [];
+  try {
+    const otherRes = await pool.query(
+      "SELECT id, slug, title, category, author, to_char(published_date, 'YYYY-MM-DD') as published_date, excerpt, cover_image FROM articles WHERE slug != $1 LIMIT 3",
+      [params.slug]
+    );
+    otherArticles = otherRes.rows;
+  } catch (err) {
+    console.error("Error fetching other articles:", err);
+  }
 
   return (
     <main className="relative min-h-screen overflow-x-hidden bg-[linear-gradient(35deg,#110C4C_25%,#6F2ED6_100%)] px-4 pb-24 pt-28 text-white md:px-12 lg:px-16">

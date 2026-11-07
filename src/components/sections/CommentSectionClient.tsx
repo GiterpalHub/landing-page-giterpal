@@ -4,7 +4,6 @@ import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import CommentInput from "../CommentInput";
 import CommentItem from "./CommentItem";
-import { createClient } from "@/lib/supabase";
 import { CommentType, getInitials } from "@/lib/commentUtils";
 
 const avatarClass = "flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-[#6F2ED6] text-sm font-bold tracking-wide text-white shadow-md";
@@ -29,24 +28,20 @@ export default function CommentSectionClient({ articleId, initialComments, serve
     if (!storedId) {
       storedId = `guest_${Math.random().toString(36).substring(2, 15)}`;
       localStorage.setItem("giterpal_guest_id", storedId);
+      document.cookie = `giterpal_guest_id=${storedId}; path=/; max-age=31536000; SameSite=Lax`;
     }
-    
-    document.cookie = `giterpal_guest_id=${storedId}; path=/; max-age=31536000; SameSite=Lax`;
-    
-    if (storedId !== currentUserId) {
-      setCurrentUserId(storedId);
-    }
-  }, [currentUserId]);
+    setCurrentUserId(storedId);
+  }, []);
 
   useEffect(() => {
-    setComments(prevComments => {
-      if (prevComments.length === 0) return initialComments;
-      const mergeData = (newItems: CommentType[], oldItems: CommentType[]): CommentType[] => {
-        return newItems.map(newItem => {
-          const oldItem = oldItems.find(o => o.id === newItem.id);
+    setComments((prevComments) => {
+      const mergeData = (incoming: CommentType[], existing: CommentType[]): CommentType[] => {
+        return incoming.map((newItem) => {
+          const oldItem = existing.find((o) => o.id === newItem.id);
           return {
             ...newItem,
             isLiked: oldItem ? oldItem.isLiked : newItem.isLiked,
+            likes: oldItem ? oldItem.likes : newItem.likes,
             replies: mergeData(newItem.replies, oldItem ? oldItem.replies : [])
           };
         });
@@ -55,20 +50,24 @@ export default function CommentSectionClient({ articleId, initialComments, serve
     });
   }, [initialComments]);
 
+  // Realtime synchronization via Server-Sent Events (SSE)
   useEffect(() => {
-    const supabase = createClient();
-    const channel = supabase
-      .channel(`realtime-comments-${articleId}`)
-      .on('postgres_changes', { event: '*', schema: 'public', table: 'comments', filter: `article_id=eq.${articleId}` }, () => {
-        router.refresh();
-      })
-      .on('postgres_changes', { event: '*', schema: 'public', table: 'comment_likes' }, () => {
-        router.refresh();
-      })
-      .subscribe();
+    const eventSource = new EventSource(`/api/comments/events?articleId=${encodeURIComponent(articleId)}`);
+
+    eventSource.addEventListener("comment", () => {
+      router.refresh();
+    });
+
+    eventSource.addEventListener("like", () => {
+      router.refresh();
+    });
+
+    eventSource.onerror = (err) => {
+      console.warn("SSE connection error (will reconnect automatically):", err);
+    };
 
     return () => {
-      supabase.removeChannel(channel);
+      eventSource.close();
     };
   }, [articleId, router]);
 
@@ -89,17 +88,25 @@ export default function CommentSectionClient({ articleId, initialComments, serve
     };
     setComments([...comments, newComment]);
 
-    const { data, error } = await createClient().from('comments').insert([{
-      article_id: articleId,
-      author: guestName,
-      content: text,
-      parent_id: null,
-      user_id: currentUserId,
-    }]).select().single();
+    try {
+      const res = await fetch("/api/comments", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          articleId,
+          author: guestName,
+          content: text,
+          parentId: null,
+          userId: currentUserId,
+        }),
+      });
 
-    if (error) console.error("Gagal mengirim komentar", error);
-    if (data) {
-      setComments((prev) => prev.map(c => c.id === tempId ? { ...c, id: data.id } : c));
+      const json = await res.json();
+      if (json.data) {
+        setComments((prev) => prev.map(c => c.id === tempId ? { ...c, id: json.data.id } : c));
+      }
+    } catch (error) {
+      console.error("Gagal mengirim komentar:", error);
     }
   };
 
@@ -125,13 +132,21 @@ export default function CommentSectionClient({ articleId, initialComments, serve
     }));
     setReplyingTo(null);
 
-    await createClient().from('comments').insert([{
-      article_id: articleId,
-      author: guestName,
-      content: text,
-      parent_id: parentId,
-      user_id: currentUserId,
-    }]);
+    try {
+      await fetch("/api/comments", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          articleId,
+          author: guestName,
+          content: text,
+          parentId,
+          userId: currentUserId,
+        }),
+      });
+    } catch (error) {
+      console.error("Gagal mengirim balasan:", error);
+    }
   };
 
   const handleToggleLike = async (commentId: string, isCurrentlyLiked: boolean, parentId?: string) => {
@@ -151,11 +166,19 @@ export default function CommentSectionClient({ articleId, initialComments, serve
       return comment;
     }));
 
-    const supabase = createClient();
-    if (isCurrentlyLiked) {
-      await supabase.from('comment_likes').delete().eq('comment_id', commentId).eq('user_id', currentUserId);
-    } else {
-      await supabase.from('comment_likes').insert([{ comment_id: commentId, user_id: currentUserId }]);
+    try {
+      await fetch("/api/comments/like", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          commentId,
+          articleId,
+          userId: currentUserId,
+          isCurrentlyLiked,
+        }),
+      });
+    } catch (error) {
+      console.error("Gagal toggle like:", error);
     }
   };
 

@@ -1,16 +1,27 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-    images: {
+  output: 'standalone',
+  images: {
+    formats: ['image/avif', 'image/webp'],
     remotePatterns: [
       {
         protocol: 'https',
         hostname: 'ui-avatars.com',
       },
       {
-        protocol:'https',
-        hostname: 'tjycomgkylobmvwjidek.supabase.co',
-        pathname: '/storage/v1/object/public/**',
-      }
+        protocol: 'https',
+        hostname: 'giterpal.my.id',
+      },
+      {
+        protocol: 'http',
+        hostname: 'localhost',
+      },
+      {
+        protocol: 'http',
+        hostname: 'localhost',
+        port: '9000',
+        pathname: '/**',
+      },
     ],
   },
 };
