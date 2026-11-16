@@ -37,6 +37,10 @@
     animation: lanyardSway3 5s ease-in-out infinite alternate;
   }
 
+  .animate-cursor-spin {
+    animation: cursorSpin 1.2s linear infinite;
+  }
+
   .animate-fade-in-up {
     animation: fadeInUp 1s ease-out forwards;
     opacity: 0;
@@ -199,5 +203,21 @@
   }
   100% {
     transform: translate3d(2.5vw, 0, 0);
+  }
+}
+
+@keyframes cursorSpin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@media (pointer: fine) and (hover: hover) {
+  html.custom-cursor-active,
+  html.custom-cursor-active * {
+    cursor: none !important;
   }
 }

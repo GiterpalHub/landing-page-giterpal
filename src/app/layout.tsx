@@ -3,6 +3,7 @@ import { Plus_Jakarta_Sans, Syne } from "next/font/google";
 import "./globals.css";
 import Navbar from "@/components/layout/Navbar";
 import SmoothScroll from "@/components/layout/SmoothScroll";
+import CustomCursor from "@/components/layout/CustomCursor";
 
 const syne = Syne({
   subsets: ["latin"],
@@ -63,6 +64,7 @@ export default function RootLayout({
         className={`${syne.variable} ${jakartaSans.variable} antialiased selection:bg-[#7C3AED] selection:text-white`}
       >
         <SmoothScroll>
+          <CustomCursor />
           <Navbar />
           {children}
         </SmoothScroll>
